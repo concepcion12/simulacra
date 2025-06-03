@@ -10,17 +10,21 @@ class District:
     """Represents a district containing multiple plots."""
     def __init__(
         self,
-        district_id: DistrictID,
-        name: str,
-        wealth_level: DistrictWealth,
-        plots: List[Plot],
+        district_id: DistrictID | None = None,
+        name: str | None = None,
+        wealth_level: DistrictWealth | None = None,
+        plots: List[Plot] | None = None,
         base_rent_modifier: float = 1.0,
-        crime_rate: float = 0.0
+        crime_rate: float = 0.0,
+        **kwargs,
     ):
+        if district_id is None:
+            district_id = kwargs.get("id")
+
         self.id = district_id
         self.name = name
         self.wealth_level = wealth_level
-        self.plots = plots
+        self.plots = plots if plots is not None else []
         self.base_rent_modifier = base_rent_modifier
         self.crime_rate = crime_rate
 

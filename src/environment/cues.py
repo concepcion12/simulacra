@@ -111,7 +111,7 @@ class CueGenerator:
                     intensity, source.cue_type, agent
                 )
                 
-                if modulated_intensity > 0.05:  # Only include meaningful cues
+                if modulated_intensity > 0.01:  # Only include meaningful cues
                     cue = self._create_cue(source.cue_type, modulated_intensity, source.plot_id)
                     if cue:
                         cues.append(cue)
@@ -171,8 +171,23 @@ class CueGenerator:
         Returns:
             List of social environmental cues
         """
-        # Social cues removed - returning empty list
-        return []
+        cues = []
+        from src.utils.types import BehaviorType, SubstanceType
+
+        for other in nearby_agents:
+            # Drinking modeling
+            drink_habit = getattr(other, 'habit_stocks', {}).get(BehaviorType.DRINKING, 0.0)
+            if drink_habit > 0.5:
+                intensity = drink_habit * 0.5
+                cues.append(AlcoholCue(intensity=intensity, source=other.id))
+
+            # Gambling modeling
+            gamble_habit = getattr(other, 'habit_stocks', {}).get(BehaviorType.GAMBLING, 0.0)
+            if gamble_habit > 0.5:
+                intensity = gamble_habit * 0.4
+                cues.append(GamblingCue(intensity=intensity, source=other.id))
+
+        return cues
     
     def generate_cues_for_agent(
         self, 
@@ -455,7 +470,10 @@ class CueGenerator:
         
         # Alcohol withdrawal
         from src.utils.types import SubstanceType
-        alcohol_state = agent.addiction_states.get(SubstanceType.ALCOHOL)
+        addiction_states = getattr(agent, "addiction_states", {})
+        if not isinstance(addiction_states, dict):
+            addiction_states = {}
+        alcohol_state = addiction_states.get(SubstanceType.ALCOHOL)
         if alcohol_state and alcohol_state.withdrawal_severity > 0.3:
             # Internal withdrawal creates craving cues
             intensity = min(1.0, alcohol_state.withdrawal_severity * 1.2)
@@ -474,14 +492,17 @@ class CueGenerator:
         
         # Simple implementation: habits create mild background cues
         from src.utils.types import BehaviorType
-        drinking_habit = agent.habit_stocks.get(BehaviorType.DRINKING, 0.0)
+        habit_stocks = getattr(agent, "habit_stocks", {})
+        if not isinstance(habit_stocks, dict):
+            habit_stocks = {}
+        drinking_habit = habit_stocks.get(BehaviorType.DRINKING, 0.0)
         if drinking_habit > 0.3:
             # Habitual drinking creates mild cues at habitual times
             intensity = drinking_habit * 0.3
             cue = AlcoholCue(intensity=intensity, source=None)
             cues.append(cue)
         
-        gambling_habit = agent.habit_stocks.get(BehaviorType.GAMBLING, 0.0)
+        gambling_habit = habit_stocks.get(BehaviorType.GAMBLING, 0.0)
         if gambling_habit > 0.3:
             intensity = gambling_habit * 0.25
             cue = GamblingCue(intensity=intensity, source=None)

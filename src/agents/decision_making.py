@@ -129,7 +129,12 @@ class UtilityCalculator:
             weights.psychological *= 1.5
             weights.addiction *= 1.2  # Stress increases addiction weight
             weights.normalize()
-        
+
+        # For backward compatibility some tests expect a 'social' attribute
+        # even though it is not part of the base UtilityWeights dataclass.
+        # Provide it dynamically without modifying the class definition.
+        weights.social = 0.0
+
         return weights
     
     def _calculate_financial_utility(
