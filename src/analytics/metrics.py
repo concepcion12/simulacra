@@ -177,6 +177,39 @@ class MetricsCollector:
         self.agent_action_counts: Dict[AgentID, Counter] = defaultdict(Counter)
         self.agent_action_successes: Dict[AgentID, int] = defaultdict(int)
         self.agent_total_actions: Dict[AgentID, int] = defaultdict(int)
+
+        # Employment/unemployment tracking
+        self.unemployment_durations: Dict[AgentID, int] = defaultdict(int)
+        self.previous_employment: Dict[AgentID, Optional[Tuple[Any, Any]]] = {}
+        self.agent_job_changes: Dict[AgentID, int] = defaultdict(int)
+
+        # Pattern membership tracking
+        self.pattern_members: Dict[str, Dict[AgentID, int]] = defaultdict(dict)
+        self.monthly_job_changes = 0
+
+    def _update_employment_tracking(self, agent: Agent) -> bool:
+        """Update unemployment duration and detect job changes."""
+        current = (
+            agent.employment.employer_id if agent.employment else None,
+            agent.employment.job_id if agent.employment else None,
+        )
+
+        prev = self.previous_employment.get(agent.id)
+
+        # Update unemployment duration
+        if agent.employment is None:
+            self.unemployment_durations[agent.id] += 1
+        else:
+            self.unemployment_durations[agent.id] = 0
+
+        changed = False
+        if prev is not None and prev != current:
+            self.agent_job_changes[agent.id] += 1
+            self.monthly_job_changes += 1
+            changed = True
+
+        self.previous_employment[agent.id] = current
+        return changed
         
     def collect_agent_metrics(self, agent: Agent, timestamp: datetime) -> AgentMetrics:
         """
@@ -189,6 +222,9 @@ class MetricsCollector:
         Returns:
             Collected agent metrics
         """
+        # Update employment/unemployment tracking
+        self._update_employment_tracking(agent)
+
         # Calculate action metrics from history
         action_diversity = self._calculate_action_diversity(agent.id)
         most_frequent = self._get_most_frequent_action(agent.id)
@@ -210,13 +246,12 @@ class MetricsCollector:
         if agent.id in self.agent_metrics:
             wealth_change = agent.internal_state.wealth - self.agent_metrics[agent.id].wealth
         
-        # Calculate employment duration (simplified - would need proper tracking)
+        # Calculate employment metrics
         employment_duration = 0
         work_performance = 0.0
         if agent.employment:
-            # For now, just use a placeholder - would need proper time tracking
-            employment_duration = 1  # Assume 1 month for simplicity
-            work_performance = agent.employment.performance
+            employment_duration = agent.employment.performance_history.months_employed
+            work_performance = agent.employment.performance_history.average_performance
         
         metrics = AgentMetrics(
             agent_id=agent.id,
@@ -230,6 +265,7 @@ class MetricsCollector:
             # Employment
             employed=agent.employment is not None,
             employment_duration=employment_duration,
+            job_changes=self.agent_job_changes.get(agent.id, 0),
             work_performance=work_performance,
             
             # Housing
@@ -300,8 +336,9 @@ class MetricsCollector:
                 heavy_drinking_rate=0,
                 problem_gambling_rate=0
             )
-        
-        # Collect individual metrics first
+
+        # Collect individual metrics first and track job changes
+        self.monthly_job_changes = 0
         for agent in agents:
             self.collect_agent_metrics(agent, timestamp)
         
@@ -348,12 +385,26 @@ class MetricsCollector:
             if self._calculate_behavior_frequency(agent, ActionType.DRINK, 10) > 0.3
         )
         heavy_drinking_rate = heavy_drinking_count / len(agents)
-        
+
         problem_gambling_count = sum(
             1 for agent in agents
             if agent.habit_stocks[BehaviorType.GAMBLING] > 0.5
         )
         problem_gambling_rate = problem_gambling_count / len(agents)
+
+        # Unemployment metrics
+        unemployed_durations = [
+            self.unemployment_durations[agent.id]
+            for agent in agents
+            if agent.employment is None
+        ]
+        unemployment_duration_mean = (
+            float(np.mean(unemployed_durations)) if unemployed_durations else 0.0
+        )
+
+        # Job turnover metrics
+        job_turnover_rate = self.monthly_job_changes / len(agents)
+        self.monthly_job_changes = 0
         
         # Action distribution
         action_distribution = self._calculate_population_action_distribution(agents)
@@ -367,8 +418,8 @@ class MetricsCollector:
             wealth_gini_coefficient=wealth_gini,
             poverty_rate=poverty_rate,
             employment_rate=employment_rate,
-            unemployment_duration_mean=0,  # TODO: Track unemployment duration
-            job_turnover_rate=0,  # TODO: Track job changes
+            unemployment_duration_mean=unemployment_duration_mean,
+            job_turnover_rate=job_turnover_rate,
             homelessness_rate=homelessness_rate,
             housing_instability_rate=housing_instability_rate,
             mean_stress=mean_stress,
@@ -398,39 +449,53 @@ class MetricsCollector:
         # Addiction spiral pattern
         addiction_spiral_agents = [
             agent for agent in agents
-            if (agent.addiction_states[SubstanceType.ALCOHOL].stock > 0.7 and
-                agent.internal_state.wealth < self.poverty_line and
-                agent.internal_state.stress > 0.7)
+            if (
+                agent.addiction_states[SubstanceType.ALCOHOL].stock > 0.7
+                and agent.internal_state.wealth < self.poverty_line
+                and agent.internal_state.stress > 0.7
+            )
         ]
-        
+
         if addiction_spiral_agents:
-            patterns.append(BehavioralPattern(
-                pattern_id="addiction_spiral",
-                pattern_type="addiction_spiral",
-                agent_count=len(addiction_spiral_agents),
-                avg_duration=0,  # TODO: Track pattern duration
-                characteristics={
-                    "avg_addiction_level": np.mean([
-                        agent.addiction_states[SubstanceType.ALCOHOL].stock 
-                        for agent in addiction_spiral_agents
-                    ]),
-                    "avg_wealth": np.mean([
-                        agent.internal_state.wealth 
-                        for agent in addiction_spiral_agents
-                    ]),
-                    "employment_rate": sum(
-                        1 for agent in addiction_spiral_agents 
-                        if agent.employment is not None
-                    ) / len(addiction_spiral_agents)
-                }
-            ))
+            pattern_id = "addiction_spiral"
+            current_members = {}
+            durations = []
+            for agent in addiction_spiral_agents:
+                prev = self.pattern_members[pattern_id].get(agent.id, 0)
+                duration = prev + 1
+                current_members[agent.id] = duration
+                durations.append(duration)
+            self.pattern_members[pattern_id] = current_members
+
+            patterns.append(
+                BehavioralPattern(
+                    pattern_id=pattern_id,
+                    pattern_type="addiction_spiral",
+                    agent_count=len(addiction_spiral_agents),
+                    avg_duration=float(np.mean(durations)) if durations else 0.0,
+                    characteristics={
+                        "avg_addiction_level": np.mean([
+                            agent.addiction_states[SubstanceType.ALCOHOL].stock
+                            for agent in addiction_spiral_agents
+                        ]),
+                        "avg_wealth": np.mean([
+                            agent.internal_state.wealth
+                            for agent in addiction_spiral_agents
+                        ]),
+                        "employment_rate": sum(
+                            1 for agent in addiction_spiral_agents
+                            if agent.employment is not None
+                        ) / len(addiction_spiral_agents)
+                    },
+                )
+            )
         
         # Stable employment pattern
         stable_employment_agents = [
             agent for agent in agents
             if (agent.employment is not None and
-                agent.employment.months_employed > 6 and
-                agent.employment.performance > 0.7)
+                agent.employment.performance_history.months_employed > 6 and
+                agent.employment.performance_history.average_performance > 0.7)
         ]
         
         if stable_employment_agents:
@@ -439,7 +504,7 @@ class MetricsCollector:
                 pattern_type="stable_employment",
                 agent_count=len(stable_employment_agents),
                 avg_duration=np.mean([
-                    agent.employment.months_employed
+                    agent.employment.performance_history.months_employed
                     for agent in stable_employment_agents
                 ]),
                 characteristics={
