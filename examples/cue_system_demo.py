@@ -7,9 +7,11 @@ internal states and proximity to cue sources.
 """
 import sys
 import os
+from pathlib import Path
 
-# Add the src directory to the path so we can import our modules
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# Add the project root to sys.path so we can import the ``src`` package
+project_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_root))
 
 from src.environment.cues import CueGenerator
 from src.utils.types import (
