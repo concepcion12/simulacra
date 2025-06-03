@@ -180,6 +180,11 @@ class SetupWizard {
                                     <label class="btn btn-outline-primary" for="sizeLarge">Large</label>
                                 </div>
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Map Preview</label>
+                                <div id="cityMapPreview" class="border p-2" style="height: 200px;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -260,6 +265,7 @@ class SetupWizard {
         
         this.setupCityConfigurationHandlers();
         this.updateCitySummary();
+        this.renderCityPreview();
     }
     
     setupCityConfigurationHandlers() {
@@ -315,6 +321,40 @@ class SetupWizard {
         if (totalBuildingsEl) totalBuildingsEl.textContent = totalBuildings;
         if (housingCapacityEl) housingCapacityEl.textContent = housingCapacity;
         if (employmentCapacityEl) employmentCapacityEl.textContent = employmentCapacity;
+
+        this.renderCityPreview();
+    }
+
+    renderCityPreview() {
+        const container = d3.select('#cityMapPreview');
+        if (container.empty()) return;
+        container.selectAll('*').remove();
+
+        const width = parseInt(container.style('width'));
+        const height = parseInt(container.style('height'));
+        const svg = container.append('svg').attr('width', width).attr('height', height);
+
+        const size = app.state.configuration.citySize || 'medium';
+        const grid = size === 'small' ? 20 : size === 'large' ? 50 : 30;
+        const scaleX = d3.scaleLinear().domain([0, grid]).range([0, width]);
+        const scaleY = d3.scaleLinear().domain([0, grid]).range([0, height]);
+
+        const cells = [];
+        for (let x = 0; x < grid; x++) {
+            for (let y = 0; y < grid; y++) {
+                cells.push({x, y});
+            }
+        }
+
+        svg.selectAll('rect').data(cells).enter()
+            .append('rect')
+            .attr('x', d => scaleX(d.x))
+            .attr('y', d => scaleY(d.y))
+            .attr('width', scaleX(1) - scaleX(0))
+            .attr('height', scaleY(1) - scaleY(0))
+            .attr('fill', '#2d3748')
+            .attr('stroke', '#444')
+            .attr('stroke-width', 0.5);
     }
     
     showPopulationConfigurationStep(container) {

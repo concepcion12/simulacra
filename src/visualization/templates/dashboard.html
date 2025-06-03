@@ -320,6 +320,16 @@
                     <button class="btn btn-outline-info btn-sm w-100" id="requestUpdate">
                         <i class="fas fa-sync-alt"></i> Manual Update
                     </button>
+
+                    <div class="mt-3">
+                        <label for="timelineSlider" class="form-label">Timeline</label>
+                        <input type="range" class="form-range" id="timelineSlider" min="0" max="100" value="0">
+                        <div class="small text-muted" id="timelineValue"></div>
+                    </div>
+
+                    <button class="btn btn-outline-primary btn-sm w-100 mt-2" id="exportMap">
+                        <i class="fas fa-download"></i> Export Map Snapshot
+                    </button>
                 </div>
 
                 <!-- Quick Stats -->
@@ -363,14 +373,14 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script>
-        // Dashboard JavaScript will be loaded here
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Simulacra Dashboard Loaded');
             initializeDashboard();
+            const exportBtn = document.getElementById('exportMap');
+            if (exportBtn) exportBtn.addEventListener('click', exportMap);
         });
     </script>
-
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
-</html> 
+</html>
