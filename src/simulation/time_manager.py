@@ -311,7 +311,7 @@ class TimeManager:
         agent.internal_state.stress = min(1.0, agent.internal_state.stress + 0.4)
         
         # Negative mood impact
-        agent.internal_state.mood = max(-1.0, agent.internal_state.mood - 0.3)
+        agent.internal_state.mood = max(-1.0, agent.internal_state.mood - 0.4)
         
         # Update statistics
         self.current_month_stats.agents_evicted += 1
@@ -332,7 +332,7 @@ class TimeManager:
         # Update statistics
         self.current_month_stats.agents_lost_jobs += 1
         
-    def _trigger_event(self, event_type: TimeEvent, agents: List[Any]) -> None:
+    def _trigger_event(self, event_type: TimeEvent, agents: List[Any], *_, **__) -> None:
         """Trigger all handlers for a specific event type."""
         for handler in self.event_handlers[event_type]:
             try:

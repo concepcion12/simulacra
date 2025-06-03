@@ -9,12 +9,19 @@ class Plot:
     """Represents a spatial plot within the city."""
     def __init__(
         self,
-        plot_id: PlotID,
-        location: Coordinate,
-        district: DistrictID,
-        plot_type: PlotType,
-        building: Optional[object] = None
+        plot_id: PlotID | None = None,
+        location: Coordinate | None = None,
+        district: DistrictID | None = None,
+        plot_type: PlotType | None = None,
+        building: Optional[object] = None,
+        **kwargs,
     ):
+        # Support alternate keyword names used in tests
+        if plot_id is None:
+            plot_id = kwargs.get("id")
+        if district is None:
+            district = kwargs.get("district_id")
+
         self.id = plot_id
         self.location = location
         self.district = district

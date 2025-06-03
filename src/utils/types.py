@@ -16,7 +16,27 @@ JobID = NewType('JobID', str)
 UnitID = NewType('UnitID', str)
 
 # Coordinate type for spatial locations
-Coordinate = Tuple[float, float]
+class Coordinate(tuple):
+    """Simple tuple subclass to represent x,y coordinates."""
+
+    def __new__(cls, coords: Tuple[float, float] | list[float] | 'Coordinate'):
+        if isinstance(coords, Coordinate):
+            return coords
+        if len(coords) != 2:
+            raise ValueError("Coordinate expects a sequence of length 2")
+        return super().__new__(cls, coords)
+
+    @property
+    def x(self) -> float:
+        return self[0]
+
+    @property
+    def y(self) -> float:
+        return self[1]
+
+    def as_tuple(self) -> Tuple[float, float]:
+        """Return the coordinate as a plain tuple."""
+        return (self[0], self[1])
 
 
 class ActionType(Enum):
@@ -303,10 +323,12 @@ class SimulationTime:
     """Simulation time tracking."""
     month: int = 1
     year: int = 1
+    _month_progress: float = 0.0
     
     def advance(self) -> None:
         """Advance time by one month."""
         self.month += 1
+        self._month_progress = 0.0
         if self.month > 12:
             self.month = 1
             self.year += 1
@@ -319,8 +341,11 @@ class SimulationTime:
     @property
     def month_progress(self) -> float:
         """Get progress through current month [0,1]."""
-        # This would be more sophisticated in real implementation
-        return 0.5  # Placeholder
+        return self._month_progress
+
+    @month_progress.setter
+    def month_progress(self, value: float) -> None:
+        self._month_progress = max(0.0, min(1.0, value))
 
 
 # Utility function component weights

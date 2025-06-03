@@ -158,7 +158,7 @@ class ActionOutcomeGenerator:
         house_edge = 0.05  # 5% house edge
         
         # Base probability of winning (before house edge)
-        base_win_prob = 0.47  # Slightly less than 50/50
+        base_win_prob = 0.45  # House edge on win probability
         
         # Apply gambling biases
         gambling_context = agent.gambling_context
@@ -189,7 +189,7 @@ class ActionOutcomeGenerator:
         # Calculate monetary change
         if won:
             # Win roughly 2:1 payout but with house edge
-            payout_ratio = np.random.uniform(1.8, 2.2)
+            payout_ratio = np.random.uniform(1.05, 1.3)
             monetary_change = bet_amount * payout_ratio - bet_amount
             gambling_context.loss_streak = 0
         else:
@@ -340,20 +340,20 @@ class ActionOutcomeGenerator:
     ) -> JobSearchOutcome:
         """Generate job search outcome based on agent state and market conditions."""
         # Base probability of finding job
-        base_success_prob = 0.15 * context.market_conditions
+        base_success_prob = 0.3 * context.market_conditions
         
         # Agent factors that affect job search success
         # Stress and withdrawal reduce interview performance
-        stress_penalty = agent.internal_state.stress * 0.3
+        stress_penalty = agent.internal_state.stress * 0.5
         alcohol_state = agent.addiction_states[SubstanceType.ALCOHOL]
         withdrawal_penalty = alcohol_state.withdrawal_severity * 0.4
         
         # Good mood helps with interviews
-        mood_bonus = max(0, agent.internal_state.mood) * 0.2
+        mood_bonus = max(0, agent.internal_state.mood) * 0.4
         
         # Calculate success probability
         success_prob = base_success_prob * (1 - stress_penalty - withdrawal_penalty + mood_bonus)
-        success_prob = np.clip(success_prob, 0.01, 0.5)  # Realistic bounds
+        success_prob = np.clip(success_prob, 0.01, 0.8)  # Realistic bounds
         
         # Check if job found
         job_found = np.random.random() < success_prob
