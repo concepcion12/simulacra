@@ -1,4 +1,4 @@
-# Simulacra: Advanced Agent-Based Social Simulation
+# Simulacra: Agent-Based Simulation
 
 Simulacra is a sophisticated agent-based simulation system that models complex social dynamics, behavioral economics, and addiction patterns in urban environments. The system implements behavioral economics principles, dual-process cognition, and environmental cue systems to create realistic agent behaviors.
 
