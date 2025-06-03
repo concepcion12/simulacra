@@ -1,0 +1,165 @@
+/* Setup Wizard Specific Styles */
+
+/* Progress indicators */
+.step-indicator {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    font-size: 1.5rem;
+}
+
+.step-indicator.active {
+    background: var(--secondary-color);
+    color: white;
+    transform: scale(1.1);
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+}
+
+.step-indicator.completed {
+    background: var(--success-color);
+    color: white;
+    border-color: var(--success-color);
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 5px;
+    color: var(--text-secondary);
+}
+
+.step-indicator.active + .step-label {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.step-indicator.completed + .step-label {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+/* Progress container */
+.progress-container {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+/* Population sliders */
+.population-sliders .form-range {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.population-sliders .form-range::-webkit-slider-thumb {
+    height: 20px;
+    width: 20px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+.population-sliders .form-range::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+/* Wizard navigation */
+.wizard-navigation {
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+/* Configuration summary cards */
+.config-summary-card {
+    background: rgba(52, 152, 219, 0.05);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+/* Range input styling */
+.wizard-range {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    outline: none;
+}
+
+.wizard-range::-webkit-slider-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--secondary-color);
+    border: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+}
+
+.wizard-range::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--secondary-color);
+    border: none;
+    cursor: pointer;
+}
+
+/* Validation message styling */
+#validationMessages .alert {
+    margin-top: 15px;
+    border-radius: 8px;
+}
+
+/* City map preview placeholder */
+#cityMapPreview {
+    background: linear-gradient(45deg, #1a1a1a 25%, transparent 25%), 
+                linear-gradient(-45deg, #1a1a1a 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #1a1a1a 75%), 
+                linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+/* Step content animations */
+#stepContent {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+#stepContent.loaded {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive wizard adjustments */
+@media (max-width: 768px) {
+    .step-indicator {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+    
+    .progress-container {
+        padding: 15px 0;
+    }
+    
+    .step-label {
+        font-size: 0.75rem;
+    }
+} 

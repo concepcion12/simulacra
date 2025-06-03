@@ -1,0 +1,421 @@
+/* Simulacra Unified Interface Styles */
+
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --dark-bg: #1a1a1a;
+    --card-bg: #2d3748;
+    --text-primary: #ffffff;
+    --text-secondary: #cbd5e0;
+    --border-color: rgba(52, 152, 219, 0.3);
+}
+
+/* Base styles */
+body {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, #2d3748 100%);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    padding-top: 70px; /* Account for fixed navbar */
+}
+
+/* Navigation */
+.navbar {
+    background: rgba(45, 55, 72, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--secondary-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+    border-radius: 8px;
+    margin: 0 5px;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    background: rgba(52, 152, 219, 0.2);
+    transform: translateY(-1px);
+}
+
+.navbar-nav .nav-link.active {
+    background: var(--secondary-color);
+    color: white !important;
+}
+
+/* Connection Status */
+.connection-status {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.connection-status.connected {
+    background: rgba(39, 174, 96, 0.9);
+    color: white;
+    box-shadow: 0 2px 10px rgba(39, 174, 96, 0.3);
+}
+
+.connection-status.disconnected {
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
+}
+
+/* Main Content */
+.main-content {
+    min-height: calc(100vh - 70px);
+    padding: 20px 0;
+}
+
+.content-section {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.content-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cards */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+.card-header {
+    background: rgba(52, 152, 219, 0.1);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.card-body {
+    color: var(--text-primary);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--secondary-color), #5dade2);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #2980b9, var(--secondary-color));
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+/* Template Gallery */
+.template-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(52, 152, 219, 0.4);
+}
+
+.template-card .card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.template-card .card-text {
+    flex-grow: 1;
+    margin-bottom: 1rem;
+}
+
+/* Project List */
+.project-item {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.project-item:hover {
+    background: rgba(52, 152, 219, 0.1);
+    transform: translateX(5px);
+}
+
+.project-item:last-child {
+    border-bottom: none;
+}
+
+/* Loading */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert-info {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--text-primary);
+    border-left: 4px solid var(--secondary-color);
+}
+
+.alert-warning {
+    background: rgba(243, 156, 18, 0.1);
+    color: var(--text-primary);
+    border-left: 4px solid var(--warning-color);
+}
+
+.alert-success {
+    background: rgba(39, 174, 96, 0.1);
+    color: var(--text-primary);
+    border-left: 4px solid var(--success-color);
+}
+
+.alert-danger {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--text-primary);
+    border-left: 4px solid var(--danger-color);
+}
+
+/* Badges */
+.badge {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* Forms */
+.form-control, .form-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+}
+
+.form-control:focus, .form-select:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    color: var(--text-primary);
+}
+
+.form-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Progress indicators (for setup wizard) */
+.step-indicator {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.step-indicator.active {
+    background: var(--secondary-color);
+    color: white;
+    transform: scale(1.1);
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+}
+
+.step-indicator.completed {
+    background: var(--success-color);
+    color: white;
+    border-color: var(--success-color);
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 5px;
+    color: var(--text-secondary);
+}
+
+.step-indicator.active + .step-label {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.step-indicator.completed + .step-label {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+/* Setup wizard specific styles */
+.progress-container {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.population-sliders .form-range {
+    height: 8px;
+}
+
+.population-sliders .form-range::-webkit-slider-thumb {
+    height: 20px;
+    width: 20px;
+}
+
+.wizard-navigation {
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-nav {
+        margin-top: 10px;
+    }
+    
+    .connection-status {
+        position: static;
+        margin: 10px;
+        display: inline-block;
+    }
+    
+    .main-content {
+        padding: 10px 0;
+    }
+    
+    .card {
+        margin-bottom: 20px;
+    }
+}
+
+/* Dark theme overrides for Bootstrap components */
+.dropdown-menu {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: rgba(52, 152, 219, 0.2);
+    color: var(--text-primary);
+}
+
+.dropdown-divider {
+    border-color: var(--border-color);
+}
+
+/* Text colors */
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.text-light {
+    color: var(--text-primary) !important;
+}
+
+/* Utility classes */
+.bg-dark-card {
+    background: var(--card-bg);
+}
+
+.border-primary-subtle {
+    border-color: var(--border-color) !important;
+}
+
+/* Animation utilities */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.slide-up {
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Hover effects */
+.hover-lift {
+    transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-3px);
+} 

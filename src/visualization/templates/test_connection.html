@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulacra Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        .testing { background: #fff3cd; color: #856404; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏙️ Simulacra Connection Test</h1>
+    
+    <div id="connectionStatus" class="status testing">
+        🔄 Testing connection...
+    </div>
+    
+    <div>
+        <button onclick="testConnection()">Test Connection</button>
+        <button onclick="testAPI()">Test API</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <h3>Debug Log:</h3>
+    <div id="log" class="log"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const log = document.getElementById('log');
+        const status = document.getElementById('connectionStatus');
+        
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            log.textContent += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(connected) {
+            if (connected) {
+                status.className = 'status connected';
+                status.innerHTML = '✅ Connected to Simulacra server';
+            } else {
+                status.className = 'status disconnected';
+                status.innerHTML = '❌ Disconnected from server';
+            }
+        }
+        
+        function testConnection() {
+            addLog('Initializing Socket.IO connection...');
+            
+            try {
+                const socket = io();
+                
+                socket.on('connect', () => {
+                    addLog('✅ Socket.IO connected successfully!');
+                    addLog(`Session ID: ${socket.id}`);
+                    updateStatus(true);
+                });
+                
+                socket.on('disconnect', () => {
+                    addLog('❌ Socket.IO disconnected');
+                    updateStatus(false);
+                });
+                
+                socket.on('connected', (data) => {
+                    addLog(`📨 Received connected event: ${JSON.stringify(data)}`);
+                });
+                
+                socket.on('error', (error) => {
+                    addLog(`❌ Socket.IO error: ${error}`);
+                });
+                
+                // Test emit
+                setTimeout(() => {
+                    addLog('📤 Testing emit...');
+                    socket.emit('test_message', { message: 'Hello from test page!' });
+                }, 1000);
+                
+            } catch (error) {
+                addLog(`❌ Error initializing Socket.IO: ${error.message}`);
+                updateStatus(false);
+            }
+        }
+        
+        async function testAPI() {
+            addLog('Testing API endpoints...');
+            
+            try {
+                // Test templates endpoint
+                addLog('📤 GET /api/templates');
+                const templatesResponse = await fetch('/api/templates');
+                if (templatesResponse.ok) {
+                    const templates = await templatesResponse.json();
+                    addLog(`✅ Templates API working: ${templates.length} templates found`);
+                } else {
+                    addLog(`❌ Templates API failed: ${templatesResponse.status} ${templatesResponse.statusText}`);
+                }
+                
+                // Test projects endpoint
+                addLog('📤 GET /api/projects');
+                const projectsResponse = await fetch('/api/projects');
+                if (projectsResponse.ok) {
+                    const projects = await projectsResponse.json();
+                    addLog(`✅ Projects API working: ${projects.length} projects found`);
+                } else {
+                    addLog(`❌ Projects API failed: ${projectsResponse.status} ${projectsResponse.statusText}`);
+                }
+                
+            } catch (error) {
+                addLog(`❌ API test error: ${error.message}`);
+            }
+        }
+        
+        function clearLog() {
+            log.textContent = '';
+        }
+        
+        // Auto-start connection test
+        addLog('🏙️ Simulacra Connection Test Started');
+        addLog(`URL: ${window.location.href}`);
+        addLog(`User Agent: ${navigator.userAgent}`);
+        testConnection();
+    </script>
+</body>
+</html> 

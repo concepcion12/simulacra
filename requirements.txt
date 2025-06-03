@@ -1,0 +1,50 @@
+# Core dependencies
+numpy>=1.20.0
+scipy>=1.7.0
+matplotlib>=3.4.0
+seaborn>=0.11.0
+pandas>=1.3.0
+
+# Simulation and modeling
+mesa>=3.0.0  # Agent-based modeling framework
+networkx>=3.0  # For social network modeling
+
+# Data handling and configuration
+# Note: pydantic 2.4.2 requires Rust compilation, using newer version with wheels
+# pydantic==2.4.2  # For data validation and settings management
+python-dotenv>=1.0.0  # For environment variables
+PyYAML>=6.0.1  # For configuration files
+
+# Logging and monitoring
+loguru>=0.7.0  # Better logging
+tqdm>=4.66.0  # Progress bars
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+
+# Development tools
+black>=23.11.0  # Code formatting
+flake8>=6.1.0  # Linting
+mypy>=1.7.0  # Type checking
+ipython>=8.17.0  # Interactive development
+jupyter>=1.0.0  # For notebooks and analysis
+
+# Performance profiling
+memory-profiler>=0.61.0  # Memory usage profiling
+
+# Optional: Line profiler (requires Microsoft Visual C++ Build Tools on Windows)
+# Uncomment the line below if you have build tools installed:
+# line-profiler>=4.1.0
+
+# Note: If you need pydantic 2.4.2 specifically, you may need to install:
+# - Microsoft Visual C++ Build Tools (for Windows)
+# - Rust compiler
+# Then run: pip install pydantic==2.4.2 
+# Real-time Visualization Dependencies (Phase 8.1)
+flask>=2.0.0
+flask-socketio>=5.0.0
+python-socketio>=5.0.0
+gevent>=21.0.0
+gevent-websocket>=0.10.0

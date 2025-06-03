@@ -1,0 +1,47 @@
+{
+  "id": "project_20250524_113256",
+  "configuration": {
+    "city_name": "New City 1 - 5/24/2025",
+    "city_size": "medium",
+    "districts": [],
+    "buildings": {
+      "residential": 24,
+      "commercial": 5,
+      "industrial": 3,
+      "casinos": 2,
+      "liquor_stores": 5
+    },
+    "total_agents": 100,
+    "population_mix": {
+      "balanced": 0.7,
+      "vulnerable": 0.3
+    },
+    "behavioral_params": {
+      "risk_preference": "normal",
+      "addiction_vulnerability": 0.4,
+      "economic_stress": 0.5
+    },
+    "duration_months": 4,
+    "rounds_per_month": 8,
+    "update_interval": 1,
+    "economic_conditions": {
+      "unemployment_rate": 0.08,
+      "rent_inflation": 0.02,
+      "economic_shocks": "mild",
+      "job_market": "balanced"
+    },
+    "data_collection": {
+      "agent_metrics": true,
+      "population_stats": true,
+      "life_events": true,
+      "action_history": true,
+      "export_data": true
+    },
+    "created_at": "2025-05-24T11:32:56.689615",
+    "modified_at": null,
+    "project_id": "project_20250524_113256"
+  },
+  "status": "configured",
+  "simulation_id": null,
+  "results_path": null
+}
