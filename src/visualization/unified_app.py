@@ -393,10 +393,14 @@ class UnifiedSimulacraApp:
         if Flask is None:
             raise ImportError("Flask is required. Install with: pip install flask flask-socketio")
         
-        self.app = Flask(__name__, 
-                        template_folder=self._get_template_dir(),
-                        static_folder=self._get_static_dir())
-        self.app.secret_key = 'simulacra_unified_secret_key'  # TODO: Use environment variable
+        self.app = Flask(
+            __name__,
+            template_folder=self._get_template_dir(),
+            static_folder=self._get_static_dir(),
+        )
+        self.app.secret_key = os.getenv(
+            "SIMULACRA_SECRET_KEY", "simulacra_unified_secret_key"
+        )
         self.socketio = SocketIO(self.app, cors_allowed_origins="*")
         self.port = port
         self.debug = debug

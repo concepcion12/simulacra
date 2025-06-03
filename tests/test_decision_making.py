@@ -59,9 +59,22 @@ def test_utility_calculation():
     agent.habit_stocks[BehaviorType.GAMBLING] = 0.5
     agent.update_internal_states()
     
-        # Create context    context = ActionContext(agent=agent)        # Test different actions    test_actions = [        Action(ActionType.WORK, 160),        Action(ActionType.DRINK, 2, parameters={'units': 2}),        Action(ActionType.GAMBLE, 4),        Action(ActionType.REST, 4),        Action(ActionType.BEG, 8)    ]        print(f"\nAgent state: stress={agent.internal_state.stress:.2f}, "
-          f"mood={agent.internal_state.mood:.2f}, "
-          f"alcohol_craving={agent.craving_intensities[SubstanceType.ALCOHOL]:.2f}")
+    # Create context
+    context = ActionContext(agent=agent)
+    # Test different actions
+    test_actions = [
+        Action(ActionType.WORK, 160),
+        Action(ActionType.DRINK, 2, parameters={'units': 2}),
+        Action(ActionType.GAMBLE, 4),
+        Action(ActionType.REST, 4),
+        Action(ActionType.BEG, 8)
+    ]
+
+    print(
+        f"\nAgent state: stress={agent.internal_state.stress:.2f}, "
+        f"mood={agent.internal_state.mood:.2f}, "
+        f"alcohol_craving={agent.craving_intensities[SubstanceType.ALCOHOL]:.2f}"
+    )
     
     # Calculate utilities
     utility_calc = agent.decision_maker.utility_calculator

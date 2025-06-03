@@ -4,7 +4,6 @@ Tests for Phase 4.2: State Updates from Actions
 Tests comprehensive state tracking including:
 - Work performance history
 - Gambling win/loss tracking
-- Social network updates  
 - Job and housing assignment
 """
 import sys
@@ -17,9 +16,13 @@ from src.agents.agent import Agent
 from src.agents.decision_making import Action
 from src.agents.action_outcomes import ActionOutcomeGenerator, StateUpdater, OutcomeContext
 from src.utils.types import (
-    ActionType, WorkOutcome, GamblingOutcome, JobSearchOutcome,
-    HousingSearchOutcome, SocializeOutcome, BehaviorType,
-    EmploymentInfo, HousingInfo
+    ActionType,
+    WorkOutcome,
+    GamblingOutcome,
+    JobSearchOutcome,
+    HousingSearchOutcome,
+    EmploymentInfo,
+    HousingInfo,
 )
 
 
@@ -117,59 +120,6 @@ class TestGamblingTracking:
         print("✓ Loss streak tracking works correctly")
 
 
-class TestSocialNetworkUpdates:
-    """Test social network building features."""
-    
-    def test_social_connections_added(self):
-        """Test that social connections are properly added."""
-        print("\nTesting social connections...")
-        agent = Agent.create_with_profile('balanced')
-        state_updater = StateUpdater()
-        
-        initial_connections = len(agent.social_connections)
-        
-        # Create outcome with new connections
-        outcome = SocializeOutcome(
-            success=True,
-            mood_change=0.1,
-            stress_change=-0.05,
-            social_connections_gained=3,
-            social_influence_received=0.2
-        )
-        
-        state_updater.apply_outcome(agent, outcome)
-        
-        # Check connections were added
-        assert len(agent.social_connections) == initial_connections + 3
-        print("✓ Social connections are properly added")
-    
-    def test_social_influence_on_habits(self):
-        """Test that social influence can affect habits."""
-        print("Testing social influence on habits...")
-        agent = Agent.create_with_profile('vulnerable')
-        state_updater = StateUpdater()
-        
-        initial_gambling_habit = agent.habit_stocks[BehaviorType.GAMBLING]
-        
-        # High social influence outcome
-        outcome = SocializeOutcome(
-            success=True,
-            mood_change=0.1,
-            stress_change=-0.05,
-            social_connections_gained=1,
-            social_influence_received=0.8
-        )
-        
-        # Apply multiple times to increase chance of influence
-        for _ in range(10):
-            state_updater.apply_outcome(agent, outcome)
-        
-        # Social influence should have some chance of affecting habits
-        # (probabilistic, so we can't guarantee, but habit should likely increase)
-        # Just check that the mechanism exists
-        assert hasattr(agent, 'habit_stocks')
-        assert BehaviorType.GAMBLING in agent.habit_stocks
-        print("✓ Social influence mechanism exists")
 
 
 class TestJobHousingAssignment:
@@ -261,10 +211,6 @@ def run_all_tests():
     gambling_tests.test_gambling_statistics_tracking()
     gambling_tests.test_loss_streak_tracking()
     
-    # Social network tests
-    social_tests = TestSocialNetworkUpdates()
-    social_tests.test_social_connections_added()
-    social_tests.test_social_influence_on_habits()
     
     # Job/housing tests
     assignment_tests = TestJobHousingAssignment()

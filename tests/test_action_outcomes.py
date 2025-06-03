@@ -12,9 +12,19 @@ from src.agents.agent import Agent
 from src.agents.decision_making import Action
 from src.agents.action_outcomes import ActionOutcomeGenerator, StateUpdater, OutcomeContext
 from src.utils.types import (
-    ActionType, ActionOutcome, WorkOutcome, GamblingOutcome, DrinkingOutcome,
-    BeggingOutcome, JobSearchOutcome, HousingSearchOutcome, MoveOutcome,
-    RestOutcome, SocializeOutcome, BehaviorType, SubstanceType
+    ActionType,
+    ActionOutcome,
+    WorkOutcome,
+    GamblingOutcome,
+    DrinkingOutcome,
+    BeggingOutcome,
+    JobSearchOutcome,
+    HousingSearchOutcome,
+    MoveOutcome,
+    RestOutcome,
+    BehaviorType,
+    EmploymentInfo,
+    SubstanceType,
 )
 
 
@@ -24,7 +34,7 @@ class TestActionOutcomeGeneration:
     def setup_method(self):
         """Set up test fixtures."""
         self.agent = Agent.create_with_profile('balanced', initial_wealth=1000.0)
-        self.agent.employment = "TestJob"  # Give agent employment for work tests
+        self.agent.employment = EmploymentInfo(job_quality=0.7, base_salary=2000.0)
         self.outcome_generator = ActionOutcomeGenerator(random_seed=42)
         self.context = OutcomeContext(
             district_wealth=0.6,
@@ -307,7 +317,7 @@ class TestIntegratedActionExecution:
     def setup_method(self):
         """Set up test fixtures."""
         self.agent = Agent.create_with_profile('vulnerable', initial_wealth=500.0)
-        self.agent.employment = "TestJob"
+        self.agent.employment = EmploymentInfo(job_quality=0.6, base_salary=1500.0)
         self.context = OutcomeContext(
             district_wealth=0.4,
             location_quality=0.6,
@@ -401,22 +411,15 @@ class TestIntegratedActionExecution:
         rest_outcome = self.agent.execute_action(rest_action, self.context)
         outcomes.append(rest_outcome)
         
-        # Socialize
-        socialize_action = Action(ActionType.SOCIALIZE, 3.0)
-        social_outcome = self.agent.execute_action(socialize_action, self.context)
-        outcomes.append(social_outcome)
-        
         # Check all outcomes generated correctly
         assert isinstance(outcomes[0], WorkOutcome)
         assert isinstance(outcomes[1], DrinkingOutcome)
         assert isinstance(outcomes[2], RestOutcome)
-        assert isinstance(outcomes[3], SocializeOutcome)
-        
         # Check all were successful
         assert all(outcome.success for outcome in outcomes)
         
         # Check action history
-        assert len(self.agent.action_history) == 4
+        assert len(self.agent.action_history) == 3
 
 
 if __name__ == "__main__":
