@@ -480,19 +480,80 @@ class RealtimeDashboard {
     
     // Control methods
     async pauseSimulation() {
-        // TODO: Implement pause functionality
-        app.showNotification('Pause functionality not yet implemented', 'warning');
+        if (!this.currentSimulation) return;
+
+        try {
+            const response = await app.apiCall('/api/simulation-control', 'POST', { action: 'pause' });
+
+            if (response.status === 'paused') {
+                clearInterval(this.progressInterval);
+                clearInterval(this.elapsedTimeInterval);
+
+                document.getElementById('pauseBtn').style.display = 'none';
+                document.getElementById('resumeBtn').style.display = 'inline-block';
+
+                this.addActivityLog('Simulation paused');
+                app.showNotification('Simulation paused', 'info');
+            } else {
+                app.showNotification('Unable to pause simulation', 'warning');
+            }
+        } catch (error) {
+            console.error('Pause error:', error);
+            app.showNotification('Error pausing simulation', 'error');
+        }
     }
-    
+
     async resumeSimulation() {
-        // TODO: Implement resume functionality
-        app.showNotification('Resume functionality not yet implemented', 'warning');
+        if (!this.currentSimulation) return;
+
+        try {
+            const response = await app.apiCall('/api/simulation-control', 'POST', { action: 'resume' });
+
+            if (response.status === 'running') {
+                document.getElementById('resumeBtn').style.display = 'none';
+                document.getElementById('pauseBtn').style.display = 'inline-block';
+
+                this.updateElapsedTime();
+                this.startProgressPolling();
+
+                this.addActivityLog('Simulation resumed');
+                app.showNotification('Simulation resumed', 'success');
+            } else {
+                app.showNotification('Unable to resume simulation', 'warning');
+            }
+        } catch (error) {
+            console.error('Resume error:', error);
+            app.showNotification('Error resuming simulation', 'error');
+        }
     }
-    
+
     async stopSimulation() {
         if (confirm('Are you sure you want to stop the simulation? This cannot be undone.')) {
-            // TODO: Implement stop functionality
-            app.showNotification('Stop functionality not yet implemented', 'warning');
+            try {
+                const response = await app.apiCall('/api/simulation-control', 'POST', { action: 'stop' });
+
+                if (response.status === 'stopped') {
+                    clearInterval(this.progressInterval);
+                    clearInterval(this.elapsedTimeInterval);
+
+                    document.getElementById('pauseBtn').style.display = 'none';
+                    document.getElementById('resumeBtn').style.display = 'none';
+                    document.getElementById('stopBtn').style.display = 'none';
+
+                    const titleEl = document.getElementById('simulationTitle');
+                    if (titleEl) {
+                        titleEl.textContent = titleEl.textContent.replace('Running', 'Stopped');
+                    }
+
+                    this.addActivityLog('Simulation stopped');
+                    app.showNotification('Simulation stopped', 'info');
+                } else {
+                    app.showNotification('Unable to stop simulation', 'warning');
+                }
+            } catch (error) {
+                console.error('Stop error:', error);
+                app.showNotification('Error stopping simulation', 'error');
+            }
         }
     }
     
