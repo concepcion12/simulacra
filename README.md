@@ -32,6 +32,15 @@ python start_unified_interface.py
 
 Open <http://localhost:5000> in your browser to configure and run a simulation.
 
+### Running the Example Scripts
+
+Demo scripts are located in the `examples/` directory. Run them from the project
+root so the `src` package can be discovered:
+
+```bash
+python examples/cue_system_demo.py
+```
+
 ## Running Tests
 
 This project uses `pytest`. To execute the test suite run:
