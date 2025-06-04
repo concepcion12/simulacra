@@ -92,6 +92,15 @@ class VisualizationServer:
                 return jsonify(data)
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
+
+        @self.app.route('/api/round-history')
+        def get_round_history():
+            """Get per-round metrics history."""
+            try:
+                history = self.data_streamer.get_round_history()
+                return jsonify(history)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         
         @self.app.route('/api/simulation-control', methods=['POST'])
         def simulation_control():
