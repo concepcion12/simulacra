@@ -1,6 +1,6 @@
 // Dashboard map rendering and controls
 let layoutData = null;
-let agentLayer, buildingLayer, heatLayer;
+let districtLayer, buildingLayer, agentLayer, heatLayer;
 let svg, mainGroup;
 let xScale, yScale;
 let zoom;
@@ -8,8 +8,9 @@ let zoom;
 function initializeDashboard() {
     svg = d3.select('#cityMap');
     mainGroup = svg.append('g');
-    agentLayer = mainGroup.append('g').attr('id', 'agents');
+    districtLayer = mainGroup.append('g').attr('id', 'districts');
     buildingLayer = mainGroup.append('g').attr('id', 'buildings');
+    agentLayer = mainGroup.append('g').attr('id', 'agents');
     heatLayer = mainGroup.append('g').attr('id', 'heat');
 
     zoom = d3.zoom().scaleExtent([0.5, 8]).on('zoom', (event) => {
@@ -48,21 +49,60 @@ function setupScales() {
 }
 
 function renderLayout() {
+    districtLayer.selectAll('*').remove();
     buildingLayer.selectAll('*').remove();
 
-    // Buildings
-    buildingLayer.selectAll('rect.building')
+    // --- Draw district boundaries ---
+    const plotsByDistrict = d3.group(layoutData.plots, p => p.district_id);
+    layoutData.districts.forEach(district => {
+        const plots = plotsByDistrict.get(district.id) || [];
+        const points = plots.map(p => [xScale(p.location.x), yScale(p.location.y)]);
+        let polygon = d3.polygonHull(points);
+
+        if (!polygon && points.length) {
+            const xs = points.map(p => p[0]);
+            const ys = points.map(p => p[1]);
+            polygon = [
+                [Math.min(...xs) - 5, Math.min(...ys) - 5],
+                [Math.max(...xs) + 5, Math.min(...ys) - 5],
+                [Math.max(...xs) + 5, Math.max(...ys) + 5],
+                [Math.min(...xs) - 5, Math.max(...ys) + 5]
+            ];
+        }
+
+        if (polygon) {
+            districtLayer.append('path')
+                .attr('class', 'district')
+                .attr('d', 'M' + polygon.map(p => p.join(',')).join('L') + 'Z')
+                .attr('fill', district.color)
+                .attr('fill-opacity', 0.1)
+                .attr('stroke', district.color)
+                .attr('stroke-width', 1.5);
+        }
+    });
+
+    // --- Draw buildings ---
+    const typeStyles = {
+        'ResidentialBuilding': { color: '#4caf50', shape: d3.symbolSquare },
+        'Employer': { color: '#2196f3', shape: d3.symbolTriangle },
+        'LiquorStore': { color: '#9c27b0', shape: d3.symbolWye },
+        'Casino': { color: '#ff9800', shape: d3.symbolDiamond }
+    };
+
+    const symbol = d3.symbol().size(64);
+
+    buildingLayer.selectAll('path.building')
         .data(layoutData.buildings)
         .enter()
-        .append('rect')
+        .append('path')
         .attr('class', 'building')
-        .attr('x', d => xScale(d.location.x) - 4)
-        .attr('y', d => yScale(d.location.y) - 4)
-        .attr('width', 8)
-        .attr('height', 8)
-        .attr('fill', '#888')
+        .attr('d', d => symbol.type((typeStyles[d.type] || {}).shape || d3.symbolCircle)())
+        .attr('transform', d => `translate(${xScale(d.location.x)}, ${yScale(d.location.y)})`)
+        .attr('fill', d => (typeStyles[d.type] || {}).color || '#888')
         .attr('stroke', '#000')
         .attr('stroke-width', 0.5);
+
+    updateLegend(typeStyles);
 }
 
 async function fetchRealtime() {
@@ -112,6 +152,33 @@ function updateHeatMap(cells) {
         .attr('opacity', 0.6);
 
     rects.exit().remove();
+}
+
+function updateLegend(typeStyles) {
+    const districtLegend = d3.select('#districtLegend');
+    const buildingLegend = d3.select('#buildingLegend');
+
+    if (!districtLegend.empty()) {
+        districtLegend.html('');
+        layoutData.districts.forEach(d => {
+            districtLegend.append('div')
+                .attr('class', 'legend-item')
+                .html(`<div class="legend-color" style="background:${d.color}"></div><small>${d.name}</small>`);
+        });
+    }
+
+    if (!buildingLegend.empty()) {
+        buildingLegend.html('');
+        const seen = new Set();
+        layoutData.buildings.forEach(b => seen.add(b.type));
+        Array.from(seen).forEach(t => {
+            const style = typeStyles[t] || {color:'#888', shape:d3.symbolCircle};
+            const path = d3.symbol().type(style.shape).size(100)();
+            buildingLegend.append('div')
+                .attr('class', 'legend-item')
+                .html(`<svg width="20" height="20"><path d="${path}" fill="${style.color}" stroke="#000" stroke-width="1"></path></svg><small>${t}</small>`);
+        });
+    }
 }
 
 function updateTimeline(state) {
