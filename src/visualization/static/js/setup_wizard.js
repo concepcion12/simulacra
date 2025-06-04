@@ -355,6 +355,72 @@ class SetupWizard {
             .attr('fill', '#2d3748')
             .attr('stroke', '#444')
             .attr('stroke-width', 0.5);
+
+        // ---- Place sample buildings ----
+        const getVal = (id) => parseInt(document.getElementById(id)?.value || 0);
+        const counts = {
+            residential: getVal('residentialCount'),
+            commercial: getVal('commercialCount'),
+            industrial: getVal('industrialCount'),
+            casinos: getVal('casinosCount'),
+            liquor_stores: getVal('liquorStoresCount')
+        };
+
+        const shuffled = d3.shuffle(cells.slice());
+        const buildings = [];
+        Object.entries(counts).forEach(([type, count]) => {
+            for (let i = 0; i < count && shuffled.length; i++) {
+                const cell = shuffled.pop();
+                buildings.push({type, x: cell.x + 0.5, y: cell.y + 0.5});
+            }
+        });
+
+        const typeStyles = {
+            residential: {color: '#4caf50', shape: d3.symbolSquare},
+            commercial: {color: '#2196f3', shape: d3.symbolTriangle},
+            industrial: {color: '#757575', shape: d3.symbolDiamond},
+            casinos: {color: '#ff9800', shape: d3.symbolStar},
+            liquor_stores: {color: '#9c27b0', shape: d3.symbolCircle}
+        };
+
+        const cellArea = (scaleX(1) - scaleX(0)) * (scaleY(1) - scaleY(0));
+        const symbol = d3.symbol().size(cellArea * 0.5);
+
+        svg.selectAll('path.building').data(buildings).enter()
+            .append('path')
+            .attr('class', 'building-icon')
+            .attr('d', d => symbol.type(typeStyles[d.type].shape)())
+            .attr('transform', d => `translate(${scaleX(d.x)}, ${scaleY(d.y)})`)
+            .attr('fill', d => typeStyles[d.type].color)
+            .attr('stroke', '#000')
+            .attr('stroke-width', 0.5);
+
+        // ---- Optional district borders ----
+        const districts = app.state.configuration.districts || [];
+        if (districts.length > 1) {
+            const rows = Math.ceil(Math.sqrt(districts.length));
+            const cols = Math.ceil(districts.length / rows);
+            for (let i = 1; i < cols; i++) {
+                const x = i * grid / cols;
+                svg.append('line')
+                    .attr('x1', scaleX(x))
+                    .attr('y1', 0)
+                    .attr('x2', scaleX(x))
+                    .attr('y2', height)
+                    .attr('stroke', '#555')
+                    .attr('stroke-dasharray', '4 2');
+            }
+            for (let i = 1; i < rows; i++) {
+                const y = i * grid / rows;
+                svg.append('line')
+                    .attr('x1', 0)
+                    .attr('y1', scaleY(y))
+                    .attr('x2', width)
+                    .attr('y2', scaleY(y))
+                    .attr('stroke', '#555')
+                    .attr('stroke-dasharray', '4 2');
+            }
+        }
     }
     
     showPopulationConfigurationStep(container) {
