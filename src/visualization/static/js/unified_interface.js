@@ -419,9 +419,51 @@ class SimulacraApp {
     }
     
     showLoadProjectDialog() {
-        // For now, just show the projects list
-        this.showSection('home');
-        // TODO: Implement proper project selection dialog
+        // Create a modal listing available projects for the user to choose from
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+
+        const projects = this.state.projects || [];
+        const projectItems = projects.length > 0 ?
+            projects.map(p => `
+                <button type="button" class="list-group-item list-group-item-action" data-project-id="${p.id}">
+                    <strong>${p.name}</strong><br/>
+                    <small class="text-muted">${p.agents || 0} agents, ${p.duration || 0} months</small>
+                </button>
+            `).join('') :
+            '<p class="text-muted mb-0">No projects available</p>';
+
+        modal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Load Project</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group">${projectItems}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+
+        // Handle selection
+        modal.querySelectorAll('[data-project-id]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const projId = e.currentTarget.getAttribute('data-project-id');
+                bsModal.hide();
+                this.loadProject(projId);
+            });
+        });
+
+        // Clean up modal once hidden
+        modal.addEventListener('hidden.bs.modal', () => {
+            document.body.removeChild(modal);
+        });
     }
     
     showTemplateGallery() {
