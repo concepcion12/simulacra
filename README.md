@@ -9,6 +9,8 @@ Simulacra is an agent-based urban simulation platform focused on behavioral econ
 - **Population generation** utilities for realistic or custom agent distributions
 - **Analytics** module collecting detailed agent and population metrics
 - **Real-time dashboard** and web-based setup wizard built with Flask and Socket.IO
+- **Threaded simulation** option for faster agent updates
+- **Pause/resume controls** to manage running simulations
 
 ## Installation
 

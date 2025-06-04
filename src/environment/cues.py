@@ -64,6 +64,18 @@ class CueGenerator:
         """Initialize the cue generator."""
         self._cue_sources_cache: Dict[PlotID, List[CueSource]] = {}
         self._last_cache_update = 0
+        self._precomputed = False
+
+    def precompute_city_cue_sources(self, city: 'City') -> None:
+        """Precompute cue sources for all buildings in the city."""
+        self._cue_sources_cache = {}
+        for district in city.districts:
+            for plot in district.plots:
+                if plot.building is not None:
+                    sources = self._get_building_cue_sources(plot.building)
+                    if sources:
+                        self._cue_sources_cache[plot.id] = sources
+        self._precomputed = True
     
     def generate_spatial_cues(
         self, 
@@ -313,42 +325,43 @@ class CueGenerator:
         return max(0.0, min(1.0, intensity))
     
     def _get_nearby_cue_sources(
-        self, 
-        agent_location: Coordinate, 
+        self,
+        agent_location: Coordinate,
         city: 'City'
     ) -> List[CueSource]:
         """Get all cue sources within potential influence range."""
+        if not self._precomputed:
+            self.precompute_city_cue_sources(city)
+
         sources = []
-        
-        # Search through all plots for buildings that generate cues
-        for district in city.districts:
-            for plot in district.plots:
-                if plot.building is None:
-                    continue
-                
-                distance = euclidean_distance(agent_location, plot.location)
-                max_search_radius = self.DEFAULT_INFLUENCE_RADIUS * 1.5  # Buffer for efficiency
-                
-                if distance <= max_search_radius:
-                    # Get cue sources from this building
-                    building_sources = self._get_building_cue_sources(plot.building)
-                    sources.extend(building_sources)
-        
+        max_search_radius = self.DEFAULT_INFLUENCE_RADIUS * 1.5
+
+        for plot_id, cue_sources in self._cue_sources_cache.items():
+            plot = city.get_plot(plot_id)
+            if plot is None:
+                continue
+            distance = euclidean_distance(agent_location, plot.location)
+            if distance <= max_search_radius:
+                sources.extend(cue_sources)
+
         return sources
     
     def _get_building_cue_sources(self, building: 'Building') -> List[CueSource]:
         """Extract cue sources from a building."""
+        if building.plot.id in self._cue_sources_cache:
+            return self._cue_sources_cache[building.plot.id]
+
         sources = []
-        
+
         # Map building types to cue types
         building_cue_mapping = {
             'LiquorStore': CueType.ALCOHOL_CUE,
             'Casino': CueType.GAMBLING_CUE,
         }
-        
+
         building_type_name = type(building).__name__
         cue_type = building_cue_mapping.get(building_type_name)
-        
+
         if cue_type and cue_type in self.CUE_PARAMETERS:
             params = self.CUE_PARAMETERS[cue_type]
             source = CueSource(
@@ -359,7 +372,8 @@ class CueGenerator:
                 influence_radius=params['influence_radius']
             )
             sources.append(source)
-        
+
+        self._cue_sources_cache[building.plot.id] = sources
         return sources
     
     def _apply_agent_state_modulation(
