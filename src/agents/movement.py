@@ -7,17 +7,14 @@ Handles:
 - Location-based action availability
 """
 from typing import List, Dict, Optional, Tuple, Set
-import math
 from dataclasses import dataclass
 
 from src.utils.types import (
-    PlotID, ActionType, BuildingID, Coordinate,
-    ActionCost
+    PlotID, ActionType, BuildingID
 )
-from src.environment.spatial import euclidean_distance, manhattan_distance
+from src.environment.spatial import euclidean_distance
 from src.environment.plot import Plot
 from src.environment.city import City
-from src.environment.buildings.base import Building
 from src.environment.buildings.liquor_store import LiquorStore
 from src.environment.buildings.casino import Casino
 from src.environment.buildings.employer import Employer

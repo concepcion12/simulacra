@@ -5,7 +5,7 @@ This module handles the generation and processing of environmental cues that inf
 agent behavior based on spatial proximity, temporal factors, and agent internal state.
 """
 import math
-from typing import List, Dict, Set, Optional, TYPE_CHECKING
+from typing import List, Dict, Optional, TYPE_CHECKING
 from dataclasses import dataclass
 
 from src.utils.types import (
@@ -184,7 +184,7 @@ class CueGenerator:
             List of social environmental cues
         """
         cues = []
-        from src.utils.types import BehaviorType, SubstanceType
+        from src.utils.types import BehaviorType
 
         for other in nearby_agents:
             # Drinking modeling

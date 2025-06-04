@@ -2,10 +2,9 @@
 Core Agent class implementing the layered behavioral architecture.
 """
 import uuid
-from typing import Dict, List, Set, Optional, Tuple
-from dataclasses import dataclass, field
-import numpy as np
+from typing import Dict, List, Optional
 from collections import deque
+import numpy as np
 
 from src.utils.types import (
     AgentID, PlotID, ActionType, BehaviorType, SubstanceType,

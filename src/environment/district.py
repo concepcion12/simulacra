@@ -1,7 +1,7 @@
 """
 District structure for Simulacra environment.
 """
-from typing import List, Optional
+from typing import List
 from src.utils.types import DistrictID, PlotType, Coordinate, DistrictWealth
 from src.environment.plot import Plot
 from src.environment.spatial import euclidean_distance

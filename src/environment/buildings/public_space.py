@@ -2,7 +2,7 @@
 Public space for socializing and begging in Simulacra environment.
 """
 from src.environment.buildings.base import Building
-from src.utils.types import CueType, FinancialStressCue, PlotID, SubstanceType, BehaviorType, AlcoholCue, GamblingCue
+from src.utils.types import FinancialStressCue, PlotID
 
 class PublicSpace(Building):
     """Public space where agents can rest, socialize, or beg."""

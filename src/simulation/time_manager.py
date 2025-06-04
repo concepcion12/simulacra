@@ -13,8 +13,7 @@ from enum import Enum, auto
 import logging
 
 from src.utils.types import (
-    SimulationTime, AgentID, ActionOutcome, WorkOutcome, 
-    EmploymentInfo, HousingInfo, ActionBudget
+    SimulationTime, AgentID, ActionOutcome, WorkOutcome
 )
 
 

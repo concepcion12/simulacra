@@ -4,7 +4,6 @@ Implements Phase 7.3 of the roadmap.
 """
 import csv
 import json
-import os
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
@@ -13,15 +12,11 @@ import pandas as pd
 import numpy as np
 from collections import defaultdict
 
-from .metrics import (
-    AgentMetrics, PopulationMetrics, BehavioralPattern, 
-    EconomicIndicators, MetricsCollector
-)
+from .metrics import MetricsCollector
 from .history import (
-    HistoryTracker, AgentHistory, StateSnapshot, 
-    ActionRecord, LifeEvent, EventType
+    HistoryTracker, EventType
 )
-from src.utils.types import AgentID, ActionType
+from src.utils.types import AgentID
 
 
 class DataExporter(ABC):
@@ -295,8 +290,6 @@ class JSONExporter(DataExporter):
         Returns:
             Path to exported file
         """
-        filepath = self.output_dir / "simulation_state.json"
-        
         state = {
             'metadata': simulation_metadata,
             'timestamp': datetime.now().isoformat(),
@@ -328,8 +321,6 @@ class JSONExporter(DataExporter):
         Returns:
             Path to exported file
         """
-        filepath = self.output_dir / "agent_histories.json"
-        
         histories = {}
         for agent_id, history in history_tracker.agent_histories.items():
             if agent_ids is None or agent_id in agent_ids:

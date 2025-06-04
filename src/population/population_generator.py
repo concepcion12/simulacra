@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from src.agents.agent import Agent
 from src.utils.types import (
-    AgentID, PersonalityTraits, InternalState, AddictionState, 
+    AgentID, PersonalityTraits,
     BehaviorType, SubstanceType, PlotID
 )
 from .distribution_config import DistributionConfig

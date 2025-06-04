@@ -7,9 +7,8 @@ tools for agent populations before running simulations.
 
 import numpy as np
 import pandas as pd
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Tuple
 from dataclasses import dataclass, field
-from collections import defaultdict
 
 from src.agents.agent import Agent
 from src.utils.types import BehaviorType, SubstanceType

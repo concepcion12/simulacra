@@ -5,7 +5,7 @@ Provides flexible ways to specify probability distributions for all agent attrib
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Any, Optional, Union, List, Tuple
+from typing import Dict, Any, Optional, Union, Tuple
 from enum import Enum
 import numpy as np
 import json

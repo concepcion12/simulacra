@@ -6,13 +6,11 @@ from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from enum import Enum
-import json
-from collections import deque
 
 from src.utils.types import (
     AgentID, ActionType, PlotID, BuildingID,
-    InternalState, AddictionState, PersonalityTraits,
-    EmploymentInfo, HousingInfo, BehaviorType, SubstanceType
+    InternalState, PersonalityTraits,
+    BehaviorType, SubstanceType
 )
 from src.agents.agent import Agent
 from src.agents.decision_making import Action

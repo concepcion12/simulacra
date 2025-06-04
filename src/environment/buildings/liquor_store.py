@@ -2,8 +2,7 @@
 Liquor store implementation for Simulacra environment.
 """
 from src.environment.buildings.base import Building
-from src.utils.types import SubstanceType, AlcoholCue, PlotID, AgentID
-from src.environment.spatial import euclidean_distance
+from src.utils.types import SubstanceType, AlcoholCue, PlotID
 
 
 class AlcoholPurchase:
