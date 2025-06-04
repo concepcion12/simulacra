@@ -309,10 +309,11 @@ class TestSimulationIntegration(unittest.TestCase):
             simulation.add_agent(agent)
             
         state = simulation.get_simulation_state()
-        
+
         self.assertEqual(state['total_agents'], 3)
         self.assertEqual(state['months_completed'], 0)
         self.assertFalse(state['is_running'])
+        self.assertFalse(state['is_paused'])
         
     def test_agent_summary(self):
         """Test agent summary statistics."""

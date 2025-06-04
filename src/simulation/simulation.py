@@ -21,6 +21,8 @@ class SimulationConfig:
     max_agents: int = 100
     enable_logging: bool = True
     log_level: str = "INFO"
+    use_threading: bool = False
+    num_threads: int = 4
 
  
 class Simulation:
@@ -60,11 +62,18 @@ class Simulation:
         
         # Simulation state
         self.is_running = False
+        self.is_paused = False
         self.months_completed = 0
         
         # Setup logging
         self._setup_logging()
         self.logger = logging.getLogger(__name__)
+
+        # Precompute cue sources for performance
+        try:
+            self.cue_generator.precompute_city_cue_sources(self.city)
+        except Exception:
+            pass
         
         # Configure time manager
         self.time_manager.set_rounds_per_month(self.config.rounds_per_month)
@@ -134,9 +143,10 @@ class Simulation:
         )
         
         self.is_running = True
-        
+
         try:
             while self.months_completed < self.config.max_months and self.is_running:
+                self._wait_if_paused()
                 self._run_single_month()
                 self.months_completed += 1
                 
@@ -169,6 +179,7 @@ class Simulation:
         # Run action rounds
         month_continues = True
         while month_continues and self.is_running:
+            self._wait_if_paused()
             month_continues = self._run_action_round()
             
     def _run_action_round(self) -> bool:
@@ -190,11 +201,21 @@ class Simulation:
         random.shuffle(agent_order)
         
         # Each agent takes one action this round
-        for agent in agent_order:
-            if not self.is_running:
-                break
-                
-            self._process_agent_turn(agent)
+        if self.config.use_threading and self.config.num_threads > 1:
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=self.config.num_threads) as executor:
+                for agent in agent_order:
+                    if not self.is_running:
+                        break
+                    self._wait_if_paused()
+                    executor.submit(self._process_agent_turn, agent)
+                executor.shutdown(wait=True)
+        else:
+            for agent in agent_order:
+                if not self.is_running:
+                    break
+                self._wait_if_paused()
+                self._process_agent_turn(agent)
             
         return True
         
@@ -292,6 +313,24 @@ class Simulation:
         """Stop the simulation."""
         self.is_running = False
         self.logger.info("Simulation stop requested")
+
+    def pause(self) -> None:
+        """Pause the simulation."""
+        if self.is_running:
+            self.is_paused = True
+            self.logger.info("Simulation paused")
+
+    def resume(self) -> None:
+        """Resume the simulation if paused."""
+        if self.is_running and self.is_paused:
+            self.is_paused = False
+            self.logger.info("Simulation resumed")
+
+    def _wait_if_paused(self) -> None:
+        """Block execution if simulation is paused."""
+        import time
+        while self.is_running and self.is_paused:
+            time.sleep(0.1)
         
     def get_simulation_state(self) -> Dict[str, Any]:
         """
@@ -302,6 +341,7 @@ class Simulation:
         """
         return {
             'is_running': self.is_running,
+            'is_paused': self.is_paused,
             'months_completed': self.months_completed,
             'total_agents': len(self.agents),
             'time_info': self.time_manager.get_current_time_info(),
