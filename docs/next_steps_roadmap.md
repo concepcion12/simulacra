@@ -3,7 +3,6 @@
 This document highlights planned improvements and future features for the Simulacra simulation platform.
 
 ## Short Term Goals
-- Package the project with a `pyproject.toml` for easy installation.
 - Expand test coverage for population generation and decision making.
 - Finalize the project selection dialog in the unified interface.
 
