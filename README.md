@@ -14,14 +14,16 @@ Simulacra is an agent-based urban simulation platform focused on behavioral econ
 
 ## Installation
 
+Install the package in editable mode using the provided `pyproject.toml`:
+
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ```
 
-Optional dashboard requirements:
+Optional visualization extras can be installed with:
 
 ```bash
-pip install flask flask-socketio gevent gevent-websocket
+pip install .[visualization]
 ```
 
 ## Quick Start

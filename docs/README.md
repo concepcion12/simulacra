@@ -491,7 +491,8 @@ dashboard = RealtimeDashboard(simulation, debug=True)
 
 ## 📄 License
 
-[Add your license information here]
+Simulacra is released under the MIT License. See the `LICENSE` file for full
+license text.
 
 ## 🆘 Support
 
