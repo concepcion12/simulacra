@@ -1,6 +1,7 @@
 // Dashboard map rendering and controls
 let layoutData = null;
 let districtLayer, buildingLayer, agentLayer, heatLayer;
+let stressChart;
 let svg, mainGroup;
 let xScale, yScale;
 let zoom;
@@ -24,6 +25,7 @@ function initializeDashboard() {
 
     fetchLayout();
     fetchRealtime();
+    initStressChart();
     setInterval(fetchRealtime, 2000);
 }
 
@@ -111,6 +113,7 @@ async function fetchRealtime() {
     updateAgents(data.agents);
     updateHeatMap(data.heat_map_data.stress);
     updateTimeline(data.simulation_state);
+    updateStressChart(data.agents);
 }
 
 function updateAgents(agents) {
@@ -152,6 +155,43 @@ function updateHeatMap(cells) {
         .attr('opacity', 0.6);
 
     rects.exit().remove();
+}
+
+function initStressChart() {
+    const ctx = document.getElementById('stressChart');
+    if (ctx && window.Chart) {
+        stressChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Agents',
+                    data: [],
+                    backgroundColor: 'rgba(255,99,132,0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: 'Stress' } },
+                    y: { beginAtZero: true, title: { display: true, text: 'Count' } }
+                }
+            }
+        });
+    }
+}
+
+function updateStressChart(agents) {
+    if (!stressChart || !agents) return;
+    const bins = new Array(10).fill(0);
+    agents.forEach(a => {
+        const idx = Math.min(9, Math.floor(a.state.stress * 10));
+        bins[idx] += 1;
+    });
+    stressChart.data.labels = bins.map((_, i) => `${(i/10).toFixed(1)}-${((i+1)/10).toFixed(1)}`);
+    stressChart.data.datasets[0].data = bins;
+    stressChart.update('none');
 }
 
 function updateLegend(typeStyles) {

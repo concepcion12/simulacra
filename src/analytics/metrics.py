@@ -170,6 +170,7 @@ class MetricsCollector:
         # Storage for current metrics
         self.agent_metrics: Dict[AgentID, AgentMetrics] = {}
         self.population_metrics_history: List[PopulationMetrics] = []
+        self.round_metrics_history: List[PopulationMetrics] = []
         self.economic_indicators_history: List[EconomicIndicators] = []
         self.behavioral_patterns: List[BehavioralPattern] = []
         
@@ -301,9 +302,10 @@ class MetricsCollector:
         return metrics
     
     def collect_population_metrics(
-        self, 
-        agents: List[Agent], 
-        timestamp: datetime
+        self,
+        agents: List[Agent],
+        timestamp: datetime,
+        store_history: bool = True
     ) -> PopulationMetrics:
         """
         Collect aggregate metrics for entire population.
@@ -431,7 +433,22 @@ class MetricsCollector:
             action_distribution=action_distribution
         )
         
-        self.population_metrics_history.append(metrics)
+        if store_history:
+            self.population_metrics_history.append(metrics)
+        return metrics
+
+    def collect_round_metrics(
+        self,
+        agents: List[Agent],
+        timestamp: datetime
+    ) -> PopulationMetrics:
+        """Collect and store metrics for an individual action round."""
+        metrics = self.collect_population_metrics(
+            agents,
+            timestamp,
+            store_history=False
+        )
+        self.round_metrics_history.append(metrics)
         return metrics
     
     def identify_behavioral_patterns(self, agents: List[Agent]) -> List[BehavioralPattern]:

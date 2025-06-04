@@ -36,6 +36,9 @@ class DataStreamer:
         self.simulation = simulation
         self.metrics_collector = metrics_collector
         self.city = simulation.city
+
+        # Per-round metrics history
+        self.round_history: List[Dict[str, Any]] = []
         
         # Cache for efficient updates
         self._last_update_time: Optional[datetime] = None
@@ -64,10 +67,16 @@ class DataStreamer:
         
         # Get agent locations and states
         agent_data = self._get_agent_data()
-        
+
         # Get building occupancy
         building_data = self._get_building_occupancy_data()
-        
+
+        # Collect per-round metrics
+        round_metrics = self.metrics_collector.collect_round_metrics(
+            self.simulation.agents,
+            current_time
+        )
+
         # Get population metrics
         population_metrics = self.metrics_collector.get_latest_population_metrics()
         
@@ -81,9 +90,18 @@ class DataStreamer:
             'buildings': building_data,
             'population_metrics': population_metrics.to_dict() if population_metrics else None,
             'heat_map_data': self._get_heat_map_data(),
-            'economic_indicators': self._get_economic_indicators()
+            'economic_indicators': self._get_economic_indicators(),
+            'round_metrics': round_metrics.to_dict()
         }
-        
+
+        # Add to history
+        self.round_history.append({
+            'timestamp': current_time.isoformat(),
+            'round': self.simulation.time_manager.current_round,
+            'month': self.simulation.time_manager.current_time.month,
+            'metrics': round_metrics.to_dict()
+        })
+
         self._last_update_time = current_time
         return data
     
@@ -338,4 +356,8 @@ class DataStreamer:
         if agent.employment is not None:
             return 'circle'  # Employed
         else:
-            return 'square'  # Unemployed 
+            return 'square'  # Unemployed
+
+    def get_round_history(self) -> List[Dict[str, Any]]:
+        """Return the collected per-round metrics history."""
+        return self.round_history
