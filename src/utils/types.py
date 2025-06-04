@@ -2,9 +2,8 @@
 Type definitions and enums for the Simulacra simulation.
 """
 from enum import Enum, auto
-from typing import Dict, List, Set, Tuple, Optional, Any, NewType
+from typing import List, Tuple, Optional, NewType
 from dataclasses import dataclass
-import numpy as np
 
 # Type aliases
 AgentID = NewType('AgentID', str)

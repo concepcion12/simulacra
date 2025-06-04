@@ -5,9 +5,8 @@ import random
 from typing import List
 from src.environment.buildings.base import Building
 from src.utils.types import (
-    PlotID, SubstanceType, GamblingOutcome, GamblingCue
+    PlotID, GamblingOutcome, GamblingCue
 )
-from src.environment.spatial import euclidean_distance
 
 
 class GamblingGame:

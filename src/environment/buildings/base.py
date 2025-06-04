@@ -2,8 +2,12 @@
 Building abstract base for Simulacra environment.
 """
 from abc import ABC, abstractmethod
-from src.utils.types import BuildingID, PlotID, CueType, EnvironmentalCue
+from typing import TYPE_CHECKING
+from src.utils.types import BuildingID, PlotID, EnvironmentalCue
 from src.environment.plot import Plot
+
+if TYPE_CHECKING:
+    from src.agents.agent import Agent
 
 class Building(ABC):
     """Abstract base class for all building types."""

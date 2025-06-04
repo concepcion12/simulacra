@@ -3,14 +3,11 @@ Economic system for the Simulacra simulation.
 Implements Phase 5.3: Economic System with city-wide parameters,
 job market dynamics, housing market availability, and price fluctuations.
 """
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 from dataclasses import dataclass, field
 import random
 import math
 from collections import defaultdict
-
-from src.utils.types import EmployerID, PlotID, SimulationTime
-
 
 @dataclass
 class EconomicIndicators:

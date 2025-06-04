@@ -7,11 +7,9 @@ from dataclasses import dataclass, field, asdict
 import numpy as np
 from collections import defaultdict, Counter
 from datetime import datetime
-import statistics
 
 from src.utils.types import (
-    AgentID, ActionType, BehaviorType, SubstanceType, 
-    EmploymentInfo, HousingInfo
+    AgentID, ActionType, BehaviorType, SubstanceType
 )
 from src.agents.agent import Agent
 

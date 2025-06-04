@@ -7,15 +7,15 @@ This module implements Phase 4.1 of the roadmap:
 - Outcome → state update pipeline
 - Action failure handling and constraints
 """
-from typing import Dict, List, Optional, Any, TYPE_CHECKING
+from typing import Optional, Any, TYPE_CHECKING
 import numpy as np
 from dataclasses import dataclass
 
 from src.utils.types import (
     ActionType, ActionOutcome, WorkOutcome, GamblingOutcome, DrinkingOutcome,
     BeggingOutcome, JobSearchOutcome, HousingSearchOutcome, MoveOutcome,
-    RestOutcome, BehaviorType, SubstanceType, PlotID,
-    EmploymentInfo, HousingInfo, AgentID
+    RestOutcome, BehaviorType, SubstanceType,
+    EmploymentInfo, HousingInfo
 )
 
 if TYPE_CHECKING:
@@ -153,9 +153,6 @@ class ActionOutcomeGenerator:
         """Generate gambling outcome with house edge and near-miss mechanics."""
         # Get bet amount from action parameters or default
         bet_amount = action.parameters.get('bet_amount', min(50.0, agent.internal_state.wealth * 0.1))
-        
-        # House edge (casino always has advantage)
-        house_edge = 0.05  # 5% house edge
         
         # Base probability of winning (before house edge)
         base_win_prob = 0.45  # House edge on win probability
