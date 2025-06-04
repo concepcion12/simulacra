@@ -101,10 +101,10 @@ class VisualizationServer:
                 simulation = self.data_streamer.simulation
                 
                 if action == 'pause':
-                    # Note: Would need to implement pause functionality in simulation
+                    simulation.pause()
                     return jsonify({'status': 'paused'})
                 elif action == 'resume':
-                    # Note: Would need to implement resume functionality
+                    simulation.resume()
                     return jsonify({'status': 'running'})
                 elif action == 'stop':
                     simulation.stop()

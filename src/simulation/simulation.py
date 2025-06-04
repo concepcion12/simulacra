@@ -341,6 +341,7 @@ class Simulation:
         """
         return {
             'is_running': self.is_running,
+            'is_paused': self.is_paused,
             'months_completed': self.months_completed,
             'total_agents': len(self.agents),
             'time_info': self.time_manager.get_current_time_info(),
