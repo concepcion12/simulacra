@@ -582,11 +582,7 @@ class UnifiedSimulacraApp:
         # Shutdown route used by the desktop launcher to cleanly stop the server
         @self.app.route("/shutdown", methods=["POST"])
         def shutdown_server():  # pragma: no cover - tested via desktop launcher
-            try:
-                self.socketio.stop()
-            except RuntimeError:
-                # When running without a live server (e.g. tests) this may fail
-                pass
+            self.stop_server()
             return "Server shutting down"
 
     def _register_socket_handlers(self):
@@ -655,6 +651,9 @@ class UnifiedSimulacraApp:
     def stop_server(self) -> None:
         """Stop the running SocketIO server if possible."""
         try:
-            self.socketio.stop()
+            if getattr(self.socketio, "server", None) and getattr(
+                self.socketio, "wsgi_server", None
+            ):
+                self.socketio.stop()
         except RuntimeError:
             pass
