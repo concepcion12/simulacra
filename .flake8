@@ -1,0 +1,5 @@
+[flake8]
+max-line-length = 100
+ignore = E501,W291,W293,E128,F401,F841,F541
+exclude = src/visualization/*,tests/demo_*.py,tests/visualization_example.py,tests/validate_time_management.py,.git,__pycache__,build,dist
+exit-zero = True
