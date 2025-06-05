@@ -20,9 +20,9 @@ class Building(ABC):
     @abstractmethod
     def generate_cues(self, agent_location: PlotID) -> list[EnvironmentalCue]:
         """Generate environmental cues for an agent at a given location."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def can_interact(self, agent: 'Agent') -> bool:
         """Return whether the agent can interact with this building."""
-        pass 
+        raise NotImplementedError

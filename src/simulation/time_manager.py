@@ -247,9 +247,11 @@ class TimeManager:
         
     def _process_monthly_payments(self, agents: List[Any]) -> None:
         """Process all monthly financial obligations."""
-        # This is called at month end for any remaining payments
-        # Individual payments are handled by scheduled events
-        pass
+        # Handle any rent payments that might have been missed
+        self._process_rent_payments(agents)
+
+        # Pay outstanding salaries for employed agents
+        self._process_salary_payments(agents)
         
     def _process_rent_payments(self, agents: List[Any]) -> None:
         """Process rent payments for all agents."""
