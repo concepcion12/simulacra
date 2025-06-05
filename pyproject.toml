@@ -36,5 +36,14 @@ visualization = [
   "gevent-websocket>=0.10"
 ]
 
+desktop = [
+  "PyQt6>=6.0",
+  "PyQt6-WebEngine>=6.0"
+]
+
+[project.scripts]
+simulacra-desktop = "start_local_interface:main"
+simulacra-unified = "start_unified_interface:main"
+
 [project.urls]
 Homepage = "https://example.com"
