@@ -47,4 +47,7 @@ flask>=2.0.0
 flask-socketio>=5.0.0
 python-socketio>=5.0.0
 gevent>=21.0.0
-gevent-websocket>=0.10.0
+
+# Desktop UI
+PyQt6>=6.0
+PyQt6-WebEngine>=6.0

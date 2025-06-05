@@ -36,6 +36,14 @@ python start_unified_interface.py
 
 Open <http://localhost:5000> in your browser to configure and run a simulation.
 
+Alternatively, you can launch a desktop window that embeds the interface so no
+external browser is required. Install the optional PyQt dependencies and run:
+
+```bash
+pip install PyQt6 PyQt6-WebEngine
+python start_local_interface.py
+```
+
 ### Running the Example Scripts
 
 Demo scripts are located in the `examples/` directory. Run them from the project
