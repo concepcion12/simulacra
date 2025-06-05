@@ -41,12 +41,7 @@ cd Simulacra
 
 2. **Install dependencies**
 ```bash
-pip install -r requirements.txt
-```
-
-3. **For full visualization features (optional)**
-```bash
-pip install flask flask-socketio python-socketio gevent gevent-websocket
+./setup_simulacra.sh
 ```
 
 ### Basic Usage

@@ -4,10 +4,11 @@ Simulacra can be launched in a desktop window using PyQt6. This avoids the need 
 
 ## Installation
 
-Install the optional desktop extras after cloning the repository:
+Install the optional desktop extras after cloning the repository. The
+`setup_simulacra.sh` script will handle this automatically:
 
 ```bash
-pip install -e .[desktop]
+./setup_simulacra.sh
 ```
 
 ## Launching
