@@ -38,7 +38,9 @@ class Plot:
         return self.building is not None
 
     def __repr__(self) -> str:
+        """Return a human-readable representation for debugging."""
+        plot_type_name = self.plot_type.name if self.plot_type is not None else "UNKNOWN"
         return (
-            f"Plot(id={self.id}, type={self.plot_type.name}, "
+            f"Plot(id={self.id}, type={plot_type_name}, "
             f"loc={self.location}, occupied={self.is_occupied()})"
-        ) 
+        )
