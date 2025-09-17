@@ -65,4 +65,4 @@ class ResidentialBuilding(Building):
         """Agents can interact if an available unit exists or if they occupy one."""
         if self.get_unit_by_agent(agent.id):
             return True
-        return bool(self.get_available_units()) 
+        return bool(self.get_available_units())

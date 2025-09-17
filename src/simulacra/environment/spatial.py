@@ -35,4 +35,4 @@ def within_manhattan_radius(
     """
     Return points within a given Manhattan radius of center.
     """
-    return [p for p in points if manhattan_distance(center, p) <= radius] 
+    return [p for p in points if manhattan_distance(center, p) <= radius]

@@ -12,16 +12,16 @@ class SimulationConfiguration:
 
     city_name: str = "New City"
     city_size: str = "medium"
-    districts: list[dict[str, Any]] | list[str] = None
-    buildings: Dict[str, int] = None
+    districts: list[dict[str, Any]] | list[str] | None = None
+    buildings: Dict[str, int] | None = None
     total_agents: int = 100
-    population_mix: Dict[str, float] = None
-    behavioral_params: Dict[str, Any] = None
+    population_mix: Dict[str, float] | None = None
+    behavioral_params: Dict[str, Any] | None = None
     duration_months: int = 12
     rounds_per_month: int = 8
     update_interval: float = 1.0
-    economic_conditions: Dict[str, Any] = None
-    data_collection: Dict[str, bool] = None
+    economic_conditions: Dict[str, Any] | None = None
+    data_collection: Dict[str, bool] | None = None
     created_at: Optional[datetime] = None
     modified_at: Optional[datetime] = None
     project_id: Optional[str] = None

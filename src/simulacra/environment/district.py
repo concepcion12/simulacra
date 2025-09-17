@@ -46,4 +46,4 @@ class District:
         return (
             f"District(id={self.id}, name={self.name}, "
             f"wealth={self.wealth_level.name}, plots={len(self.plots)})"
-        ) 
+        )

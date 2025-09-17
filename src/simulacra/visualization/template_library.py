@@ -16,24 +16,43 @@ class TemplateManager:
         """Create the default template library."""
         templates: Dict[str, Dict[str, Any]] = {}
 
-        basic_config = SimulationConfiguration(
+        def build_template(
+            template_id: str,
+            name: str,
+            description: str,
+            category: str,
+            overrides: Dict[str, Any],
+            tags: list[str],
+        ) -> Dict[str, Any]:
+            configuration = SimulationConfiguration.from_dict(overrides)
+            return {
+                "id": template_id,
+                "name": name,
+                "description": description,
+                "category": category,
+                "configuration": configuration.to_dict(),
+                "tags": tags,
+            }
+
+        templates["basic_urban"] = build_template(
+            "basic_urban",
+            "Basic Urban Study",
+            "Simple urban simulation for learning and basic research",
+            "basic",
             {
                 "city_name": "Basic Urban Study",
                 "total_agents": 50,
                 "duration_months": 6,
                 "population_mix": {"balanced": 0.8, "vulnerable": 0.2},
-            }
+            },
+            ["beginner", "education", "general"],
         )
-        templates["basic_urban"] = {
-            "id": "basic_urban",
-            "name": "Basic Urban Study",
-            "description": "Simple urban simulation for learning and basic research",
-            "category": "basic",
-            "configuration": basic_config.to_dict(),
-            "tags": ["beginner", "education", "general"],
-        }
 
-        addiction_config = SimulationConfiguration(
+        templates["addiction_research"] = build_template(
+            "addiction_research",
+            "Addiction Research",
+            "Study addiction patterns and intervention effectiveness",
+            "addiction",
             {
                 "city_name": "Addiction Research Study",
                 "total_agents": 100,
@@ -51,18 +70,15 @@ class TemplateManager:
                     "economic_stress": 0.5,
                     "impulsivity_range": [0.2, 0.8],
                 },
-            }
+            },
+            ["addiction", "healthcare", "research"],
         )
-        templates["addiction_research"] = {
-            "id": "addiction_research",
-            "name": "Addiction Research",
-            "description": "Study addiction patterns and intervention effectiveness",
-            "category": "addiction",
-            "configuration": addiction_config.to_dict(),
-            "tags": ["addiction", "healthcare", "research"],
-        }
 
-        economic_config = SimulationConfiguration(
+        templates["economic_inequality"] = build_template(
+            "economic_inequality",
+            "Economic Inequality",
+            "Examine wealth distribution and economic mobility",
+            "economic",
             {
                 "city_name": "Economic Inequality Study",
                 "total_agents": 150,
@@ -79,18 +95,15 @@ class TemplateManager:
                     "economic_shocks": "mild",
                     "job_market": "balanced",
                 },
-            }
+            },
+            ["economics", "inequality", "policy"],
         )
-        templates["economic_inequality"] = {
-            "id": "economic_inequality",
-            "name": "Economic Inequality",
-            "description": "Examine wealth distribution and economic mobility",
-            "category": "economic",
-            "configuration": economic_config.to_dict(),
-            "tags": ["economics", "inequality", "policy"],
-        }
 
-        policy_config = SimulationConfiguration(
+        templates["policy_testing"] = build_template(
+            "policy_testing",
+            "Policy Testing",
+            "Test policy interventions and their effectiveness",
+            "policy",
             {
                 "city_name": "Policy Testing Environment",
                 "total_agents": 200,
@@ -100,16 +113,9 @@ class TemplateManager:
                     "vulnerable": 0.3,
                     "resilient": 0.1,
                 },
-            }
+            },
+            ["policy", "government", "intervention"],
         )
-        templates["policy_testing"] = {
-            "id": "policy_testing",
-            "name": "Policy Testing",
-            "description": "Test policy interventions and their effectiveness",
-            "category": "policy",
-            "configuration": policy_config.to_dict(),
-            "tags": ["policy", "government", "intervention"],
-        }
 
         return templates
 

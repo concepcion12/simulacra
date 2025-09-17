@@ -12,10 +12,10 @@ from .population_analyzer import PopulationAnalyzer, PopulationStats
 
 __all__ = [
     'DistributionConfig',
-    'DistributionType', 
+    'DistributionType',
     'DistributionSpec',
     'PopulationGenerator',
     'QuickPopulationFactory',
     'PopulationAnalyzer',
     'PopulationStats'
-] 
+]

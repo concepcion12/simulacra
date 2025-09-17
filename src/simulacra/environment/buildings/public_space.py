@@ -21,4 +21,4 @@ class PublicSpace(Building):
         return True
 
     def __repr__(self) -> str:
-        return f"PublicSpace(id={self.id}, name={self.space_name}, plot={self.plot.id})" 
+        return f"PublicSpace(id={self.id}, name={self.space_name}, plot={self.plot.id})"

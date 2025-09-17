@@ -29,7 +29,8 @@ class UnifiedSimulacraApp:
     def __init__(self, port: int = 5000, debug: bool = False) -> None:
         if Flask is None or SocketIO is None:  # pragma: no cover - dependency guard
             raise ImportError(
-                "Flask and flask-socketio are required. Install with: pip install flask flask-socketio"
+                "Flask and flask-socketio are required. Install with: "
+                "pip install flask flask-socketio"
             ) from _IMPORT_ERROR
 
         template_folder = self._ensure_directory("templates")
@@ -180,7 +181,9 @@ class UnifiedSimulacraApp:
     def stop_server(self) -> None:
         """Attempt to stop the running Socket.IO server."""
         try:
-            if getattr(self.socketio, "server", None) and getattr(self.socketio, "wsgi_server", None):
+            has_server = getattr(self.socketio, "server", None)
+            has_wsgi_server = getattr(self.socketio, "wsgi_server", None)
+            if has_server and has_wsgi_server:
                 self.socketio.stop()
         except RuntimeError:
             pass

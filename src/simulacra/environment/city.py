@@ -21,7 +21,7 @@ class City:
         self.name = name
         self.districts = districts
         self.time = time or SimulationTime()
-        
+
         # Create economy manager if not provided
         if global_economy is None:
             # Import here to avoid circular import
@@ -29,7 +29,7 @@ class City:
             self.global_economy = EconomyManager()
         else:
             self.global_economy = global_economy
-            
+
         # Build plot index for fast lookup
         self._plot_index: Dict[PlotID, Plot] = {}
         for district in self.districts:
@@ -65,4 +65,4 @@ class City:
         return result
 
     def __repr__(self) -> str:
-        return f"City(name={self.name}, districts={len(self.districts)})" 
+        return f"City(name={self.name}, districts={len(self.districts)})"

@@ -14,6 +14,6 @@ from .environment.city import City
 
 __all__ = [
     "Agent",
-    "Simulation", 
+    "Simulation",
     "City",
 ]

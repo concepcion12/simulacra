@@ -9,7 +9,7 @@ from .movement import MovementSystem, MovementCost
 
 __all__ = [
     'Agent',
-    'DecisionMaker', 
+    'DecisionMaker',
     'Action',
     'ActionContext',
     'generate_available_actions',

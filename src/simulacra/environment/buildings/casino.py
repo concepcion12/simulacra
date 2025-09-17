@@ -90,4 +90,4 @@ class Casino(Building):
     def __repr__(self) -> str:
         return (
             f"Casino(id={self.id}, games={len(self.games)}, house_edge={self.house_edge})"
-        ) 
+        )

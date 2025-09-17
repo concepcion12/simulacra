@@ -14,7 +14,7 @@ from .unified_app import UnifiedSimulacraApp
 
 __all__ = [
     'RealtimeDashboard',
-    'DataStreamer', 
+    'DataStreamer',
     'VisualizationServer',
     'UnifiedSimulacraApp',
     'ProjectManager',
@@ -22,4 +22,4 @@ __all__ = [
     'TemplateManager',
     'SimulationManager',
     'Project'
-] 
+]

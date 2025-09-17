@@ -8,7 +8,7 @@ from .economy import EconomyManager, EconomicIndicators, JobMarketState, Housing
 
 __all__ = [
     'Simulation',
-    'SimulationConfig', 
+    'SimulationConfig',
     'TimeManager',
     'TimeEvent',
     'MonthlyStats',
@@ -16,4 +16,4 @@ __all__ = [
     'EconomicIndicators',
     'JobMarketState',
     'HousingMarketState'
-] 
+]

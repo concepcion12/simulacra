@@ -19,4 +19,4 @@ __all__ = [
     'JobOpening',
     'Employment',
     'PublicSpace'
-] 
+]
