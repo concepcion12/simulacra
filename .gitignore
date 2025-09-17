@@ -35,10 +35,11 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
+docs/_build/
 
 # Logs
 *.log
 
 # Local development
 .env
-.env.local 
+.env.local
