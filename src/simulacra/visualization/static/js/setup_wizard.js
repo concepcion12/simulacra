@@ -120,7 +120,15 @@ class SetupWizard {
         
         const stepContent = document.getElementById('stepContent');
         const stepTitle = document.getElementById('stepTitle');
-        
+
+        if (!stepContent || !stepTitle) {
+            console.warn('Setup wizard elements missing - cannot render step content.');
+            return;
+        }
+
+        // Reset animation state before updating the step content.
+        stepContent.classList.remove('loaded');
+
         stepTitle.textContent = `Step ${stepIndex + 1}: ${this.stepTitles[stepIndex]}`;
         
         // Ensure we have the latest configuration
@@ -148,6 +156,13 @@ class SetupWizard {
         
         // Run a validation check to update warnings/errors based on current state
         this.validateCurrentStep();
+
+        const addLoadedClass = () => stepContent.classList.add('loaded');
+        if (typeof window.requestAnimationFrame === 'function') {
+            window.requestAnimationFrame(addLoadedClass);
+        } else {
+            setTimeout(addLoadedClass, 0);
+        }
     }
     
     showCityConfigurationStep(container) {
