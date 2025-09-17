@@ -47,4 +47,4 @@ class LiquorStore(Building):
         return (
             f"LiquorStore(id={self.id}, price={self.alcohol_price:.2f}, "
             f"plot={self.plot.id})"
-        ) 
+        )

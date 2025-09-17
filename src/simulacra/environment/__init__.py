@@ -10,10 +10,10 @@ from .cues import CueGenerator, EnvironmentalCue
 
 __all__ = [
     'City',
-    'District', 
+    'District',
     'Plot',
     'euclidean_distance',
     'manhattan_distance',
     'CueGenerator',
     'EnvironmentalCue'
-] 
+]

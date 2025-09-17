@@ -3,7 +3,7 @@ Analytics package for Simulacra simulation data collection and analysis.
 
 This package implements Phase 7.1-7.3 of the roadmap:
 - Metrics System (7.1): Agent-level and population-level metrics tracking
-- History Tracking (7.2): Detailed event and state history logging  
+- History Tracking (7.2): Detailed event and state history logging
 - Export Capabilities (7.3): CSV, JSON, and statistical report exports
 """
 
@@ -22,22 +22,22 @@ from .exporters import (
 __all__ = [
     # Metrics System
     "AgentMetrics",
-    "PopulationMetrics", 
+    "PopulationMetrics",
     "MetricsCollector",
     "BehavioralPattern",
     "EconomicIndicators",
-    
+
     # History Tracking
     "HistoryTracker",
     "AgentHistory",
     "LifeEvent",
     "StateSnapshot",
-    "ActionRecord", 
+    "ActionRecord",
     "EventType",
-    
+
     # Export Capabilities
     "DataExporter",
     "CSVExporter",
     "JSONExporter",
     "StatisticalReporter"
-] 
+]

@@ -1,6 +1,5 @@
 """Tests for the population generation system."""
 
-import numpy as np
 from simulacra.population import (
     DistributionConfig,
     DistributionType,

@@ -142,7 +142,7 @@ class GamblingContext:
     total_losses: float = 0.0
     total_wins: float = 0.0  # Track total winnings
     total_games: int = 0  # Track total number of gambling sessions
-    
+
     def __post_init__(self):
         if self.recent_outcomes is None:
             self.recent_outcomes = []
@@ -155,18 +155,18 @@ class WorkPerformanceHistory:
     average_performance: float = 1.0  # Running average
     months_employed: int = 0  # Total months at current job
     warnings_received: int = 0  # Performance warnings
-    
+
     def __post_init__(self):
         if self.recent_performances is None:
             self.recent_performances = []
-    
+
     def add_performance(self, performance: float) -> None:
         """Add a new performance score and update average."""
         self.recent_performances.append(performance)
         if len(self.recent_performances) > 12:  # Keep last 12 months
             self.recent_performances.pop(0)
         self.average_performance = sum(self.recent_performances) / len(self.recent_performances)
-        
+
         # Track warnings for poor performance
         if performance < 0.5:
             self.warnings_received += 1
@@ -180,7 +180,7 @@ class EmploymentInfo:
     job_quality: float = 0.5  # [0,1] affects salary and conditions
     base_salary: float = 2000.0  # Monthly base salary
     performance_history: WorkPerformanceHistory = None
-    
+
     def __post_init__(self):
         if self.performance_history is None:
             self.performance_history = WorkPerformanceHistory()
@@ -201,19 +201,19 @@ class ActionBudget:
     """Monthly action budget management."""
     total_hours: float = 280.0
     spent_hours: float = 0.0
-    
+
     def can_afford(self, hours: float) -> bool:
         """Check if agent can afford to spend hours on action."""
         return self.spent_hours + hours <= self.total_hours
-    
+
     def spend(self, hours: float) -> None:
         """Spend hours from budget."""
         self.spent_hours += hours
-    
+
     def reset(self) -> None:
         """Reset budget for new month."""
         self.spent_hours = 0.0
-    
+
     @property
     def remaining_hours(self) -> float:
         """Get remaining hours in budget."""
@@ -325,7 +325,7 @@ class SimulationTime:
     month: int = 1
     year: int = 1
     _month_progress: float = 0.0
-    
+
     def advance(self) -> None:
         """Advance time by one month."""
         self.month += 1
@@ -333,12 +333,12 @@ class SimulationTime:
         if self.month > 12:
             self.month = 1
             self.year += 1
-    
+
     @property
     def total_months(self) -> int:
         """Get total months elapsed."""
         return (self.year - 1) * 12 + self.month
-    
+
     @property
     def month_progress(self) -> float:
         """Get progress through current month [0,1]."""
@@ -357,13 +357,17 @@ class UtilityWeights:
     habit: float = 0.15
     addiction: float = 0.2
     psychological: float = 0.35
-    
+
     def normalize(self) -> None:
         """Normalize weights to sum to 1."""
-        total = (self.financial + self.habit + self.addiction + 
-                self.psychological)
+        total = (
+            self.financial
+            + self.habit
+            + self.addiction
+            + self.psychological
+        )
         if total > 0:
             self.financial /= total
             self.habit /= total
             self.addiction /= total
-            self.psychological /= total 
+            self.psychological /= total

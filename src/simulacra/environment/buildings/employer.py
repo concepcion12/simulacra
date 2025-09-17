@@ -86,4 +86,4 @@ class Employer(Building):
     def __repr__(self) -> str:
         return (
             f"Employer(id={self.id}, company={self.company_name}, jobs={len(self.jobs)})"
-        ) 
+        )

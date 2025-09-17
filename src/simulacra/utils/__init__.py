@@ -43,14 +43,14 @@ from .types import (
 __all__ = [
     # Type aliases
     "AgentID",
-    "PlotID", 
+    "PlotID",
     "DistrictID",
     "BuildingID",
     "EmployerID",
     "JobID",
     "UnitID",
     "Coordinate",
-    
+
     # Enums
     "ActionType",
     "PlotType",
@@ -58,7 +58,7 @@ __all__ = [
     "SubstanceType",
     "BehaviorType",
     "CueType",
-    
+
     # Data classes
     "ActionCost",
     "PersonalityTraits",
@@ -81,4 +81,4 @@ __all__ = [
     "RestOutcome",
     "SimulationTime",
     "UtilityWeights",
-] 
+]
