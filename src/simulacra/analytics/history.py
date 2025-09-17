@@ -104,11 +104,25 @@ class StateSnapshot:
         """Create snapshot from current agent state."""
         alcohol_state = agent.addiction_states[SubstanceType.ALCOHOL]
 
+        monthly_income = 0.0
+        employment_info: Optional[Dict[str, Any]] = None
+        if agent.employment is not None:
+            base_salary = getattr(agent.employment, 'base_salary', 0.0)
+            performance = getattr(
+                agent.employment.performance_history,
+                'average_performance',
+                1.0
+            )
+            monthly_income = base_salary * performance
+            employment_info = asdict(agent.employment)
+
+        housing_info = asdict(agent.home) if agent.home else None
+
         snapshot = cls(
             timestamp=timestamp,
             current_location=agent.current_location,
             wealth=agent.internal_state.wealth,
-            monthly_income=agent.employment.salary if agent.employment else 0.0,
+            monthly_income=monthly_income,
             monthly_expenses=agent.internal_state.monthly_expenses,
             employed=agent.employment is not None,
             housed=agent.home is not None,
@@ -122,9 +136,9 @@ class StateSnapshot:
             gambling_habit_strength=agent.habit_stocks[BehaviorType.GAMBLING],
             gambling_total_winnings=agent.gambling_context.total_wins,
             actions_taken_this_month=agent.action_budget.actions_taken,
-            time_budget_remaining=agent.action_budget.hours_remaining,
-            employment_info=asdict(agent.employment) if agent.employment else None,
-            housing_info=asdict(agent.home) if agent.home else None,
+            time_budget_remaining=agent.action_budget.remaining_hours,
+            employment_info=employment_info,
+            housing_info=housing_info,
             recent_gambling_outcomes=list(agent.gambling_context.recent_outcomes)
         )
 
@@ -405,7 +419,7 @@ class HistoryTracker:
         description: str,
         timestamp: datetime,
         **kwargs
-    ) -> None:
+    ) -> Optional[LifeEvent]:
         """
         Record a significant life event.
 
@@ -415,9 +429,11 @@ class HistoryTracker:
             description: Human-readable description
             timestamp: When event occurred
             **kwargs: Additional event details
+        Returns:
+            The created LifeEvent if the agent is tracked, otherwise None
         """
         if agent_id not in self.agent_histories:
-            return
+            return None
 
         event = LifeEvent(
             timestamp=timestamp,
@@ -432,6 +448,7 @@ class HistoryTracker:
         )
 
         self.agent_histories[agent_id].add_life_event(event)
+        return event
 
     def detect_life_events(
         self,
@@ -456,7 +473,7 @@ class HistoryTracker:
 
         # Employment changes
         if not pre_state.get('employed') and post_state.get('employed'):
-            self.record_life_event(
+            event = self.record_life_event(
                 agent.id,
                 EventType.JOB_GAINED,
                 f"Found employment at {post_state.get('employer_name', 'unknown')}",
@@ -465,9 +482,11 @@ class HistoryTracker:
                 wealth_impact=post_state.get('salary', 0),
                 stress_impact=-0.2
             )
+            if event:
+                events.append(event)
 
         elif pre_state.get('employed') and not post_state.get('employed'):
-            self.record_life_event(
+            event = self.record_life_event(
                 agent.id,
                 EventType.JOB_LOST,
                 "Lost employment",
@@ -475,10 +494,12 @@ class HistoryTracker:
                 wealth_impact=-pre_state.get('salary', 0),
                 stress_impact=0.3
             )
+            if event:
+                events.append(event)
 
         # Housing changes
         if not pre_state.get('housed') and post_state.get('housed'):
-            self.record_life_event(
+            event = self.record_life_event(
                 agent.id,
                 EventType.HOUSING_GAINED,
                 "Found housing",
@@ -486,29 +507,35 @@ class HistoryTracker:
                 details={'rent': post_state.get('rent', 0)},
                 stress_impact=-0.3
             )
+            if event:
+                events.append(event)
 
         elif pre_state.get('housed') and not post_state.get('housed'):
             if post_state.get('evicted'):
-                self.record_life_event(
+                event = self.record_life_event(
                     agent.id,
                     EventType.EVICTED,
                     "Evicted from housing",
                     timestamp,
                     stress_impact=0.5
                 )
+                if event:
+                    events.append(event)
             else:
-                self.record_life_event(
+                event = self.record_life_event(
                     agent.id,
                     EventType.HOUSING_LOST,
                     "Lost housing",
                     timestamp,
                     stress_impact=0.4
                 )
+                if event:
+                    events.append(event)
 
         # Financial events
         wealth_change = post_state.get('wealth', 0) - pre_state.get('wealth', 0)
         if wealth_change > pre_state.get('wealth', 1) * 0.5:  # 50% wealth increase
-            self.record_life_event(
+            event = self.record_life_event(
                 agent.id,
                 EventType.WINDFALL,
                 f"Large financial gain of ${wealth_change:.2f}",
@@ -516,9 +543,11 @@ class HistoryTracker:
                 wealth_impact=wealth_change,
                 mood_impact=0.3
             )
+            if event:
+                events.append(event)
 
         elif post_state.get('wealth', 0) < 0 and pre_state.get('wealth', 0) >= 0:
-            self.record_life_event(
+            event = self.record_life_event(
                 agent.id,
                 EventType.BANKRUPT,
                 "Went bankrupt",
@@ -526,19 +555,23 @@ class HistoryTracker:
                 stress_impact=0.5,
                 mood_impact=-0.4
             )
+            if event:
+                events.append(event)
 
         # Addiction events
         alcohol_level = post_state.get('alcohol_addiction_level', 0)
         prev_alcohol = pre_state.get('alcohol_addiction_level', 0)
 
         if alcohol_level > 0.5 and prev_alcohol <= 0.5:
-            self.record_life_event(
+            event = self.record_life_event(
                 agent.id,
                 EventType.ADDICTION_ONSET,
                 "Developed alcohol addiction",
                 timestamp,
                 details={'addiction_level': alcohol_level}
             )
+            if event:
+                events.append(event)
 
         return events
 
