@@ -14,30 +14,57 @@ Simulacra is an agent-based urban simulation platform focused on behavioral econ
 
 ## Installation
 
-The easiest way to get started is to run the provided setup script which creates
-a virtual environment and installs all optional extras:
+### 1. Requirements
+
+- Python 3.10 or newer (verify with `python --version` or `py --version` on Windows)
+- `pip` 22+ (automatically upgraded by the setup helper)
+- Git for cloning the repository
+- **Windows only:** we recommend installing Python from [python.org](https://www.python.org/downloads/) with the “Add Python to PATH” option enabled. If you plan to build native extensions, also install the [Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/).
+
+### 2. One-command bootstrap (recommended)
+
+Run the cross-platform helper to create a `.venv` directory and install Simulacra with the visualization and desktop extras.
+
+| Platform | Command |
+| --- | --- |
+| Windows (PowerShell) | `py setup_simulacra.py` |
+| Windows (Command Prompt) | `python setup_simulacra.py` |
+| macOS / Linux | `python3 setup_simulacra.py` |
+
+The script accepts optional flags such as `--force-recreate` to rebuild the virtual environment, `--extras` to customise installed extras, and `--include-dev` to pull in linting/test tooling. Run `python setup_simulacra.py --help` for the complete list.
+
+### 3. Activate the virtual environment
+
+| Shell | Command |
+| --- | --- |
+| Windows PowerShell | `.\.venv\Scripts\Activate.ps1` |
+| Windows Command Prompt | `.\.venv\Scripts\activate.bat` |
+| macOS / Linux (bash/zsh/fish via bash compatibility) | `source .venv/bin/activate` |
+
+If PowerShell blocks the activation script, temporarily enable it with `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`.
+
+### 4. Verify the installation
+
+After activation, run the quick smoke test:
 
 ```bash
-./setup_simulacra.sh
+python -c "import simulacra; print('Simulacra is ready!')"
 ```
 
-If you prefer manual installation, install the package in editable mode using the provided `pyproject.toml`:
+You should see `Simulacra is ready!` without any import errors.
+
+### Manual installation (alternative)
+
+If you cannot run the helper script, create a virtual environment manually and install the package in editable mode:
 
 ```bash
-pip install -e .
+python -m venv .venv
+source .venv/bin/activate  # or the Windows equivalent above
+python -m pip install --upgrade pip
+python -m pip install -e .[desktop,visualization]
 ```
 
-Optional visualization extras can be installed with:
-
-```bash
-pip install .[visualization]
-```
-
-For the desktop launcher, install the additional PyQt packages:
-
-```bash
-pip install .[desktop]
-```
+The legacy `setup_simulacra.sh` wrapper simply invokes `python3 setup_simulacra.py` for convenience on POSIX systems.
 
 ## Quick Start
 
@@ -50,7 +77,8 @@ python start_unified_interface.py
 Open <http://localhost:5000> in your browser to configure and run a simulation.
 
 Alternatively, you can launch a desktop window that embeds the interface so no
-external browser is required. After installing the `desktop` extras, run:
+external browser is required. After installing the `desktop` extras (included by default
+when using `setup_simulacra.py`), run:
 
 ```bash
 simulacra-desktop
@@ -75,4 +103,4 @@ pytest
 
 ## Documentation
 
-Detailed guides and additional documentation are located in the `docs/` directory. Start with `docs/README.md` for an in‑depth overview of available features.
+Detailed guides and additional documentation are located in the `docs/` directory. Start with `docs/README.md` for an in‑depth overview of available features and see `docs/SETUP.md` for the step-by-step installation guide.
