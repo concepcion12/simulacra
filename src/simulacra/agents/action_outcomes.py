@@ -547,8 +547,11 @@ class StateUpdater:
             return
 
         # Update wealth
-        agent.internal_state.wealth += outcome.monetary_change
-        agent.internal_state.wealth = max(0, agent.internal_state.wealth)
+        previous_wealth = agent.internal_state.wealth
+        agent.internal_state.wealth = max(
+            0,
+            previous_wealth + outcome.monetary_change,
+        )
 
         # Update mood
         agent.internal_state.mood += outcome.psychological_impact
@@ -567,7 +570,11 @@ class StateUpdater:
 
         # Increase stress if lost money
         if outcome.monetary_change < 0:
-            stress_increase = min(0.2, abs(outcome.monetary_change) / agent.internal_state.wealth)
+            wealth_reference = max(previous_wealth, 1.0)
+            stress_increase = min(
+                0.2,
+                abs(outcome.monetary_change) / wealth_reference,
+            )
             agent.internal_state.stress += stress_increase
             agent.internal_state.stress = min(1, agent.internal_state.stress)
 

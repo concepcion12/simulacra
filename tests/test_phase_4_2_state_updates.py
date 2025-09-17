@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from simulacra.agents.agent import Agent
 from simulacra.agents.decision_making import Action
@@ -89,6 +90,19 @@ class TestGamblingTracking:
         outcome = outcome_generator.generate_outcome(agent, action)
 
         assert not outcome.success
+
+    def test_loss_does_not_trigger_division_by_zero(self) -> None:
+        agent = Agent.create_with_profile("impulsive", initial_wealth=100.0)
+        state_updater = StateUpdater()
+
+        # Start from a non-zero stress level to observe the increment.
+        agent.internal_state.stress = 0.1
+
+        outcome = GamblingOutcome(success=True, monetary_change=-150.0)
+        state_updater.apply_outcome(agent, outcome)
+
+        assert agent.internal_state.wealth == 0.0
+        assert agent.internal_state.stress == pytest.approx(0.3)
 
 
 class TestJobHousingAssignment:
