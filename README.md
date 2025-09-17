@@ -23,15 +23,23 @@ Simulacra is an agent-based urban simulation platform focused on behavioral econ
 
 ### 2. One-command bootstrap (recommended)
 
-Run the cross-platform helper to create a `.venv` directory and install Simulacra with the visualization and desktop extras.
+Run the cross-platform helper to create a managed environment and install Simulacra with the visualization and desktop extras. By default it builds a `.venv` folder, upgrades `pip`, installs the requested extras and prints the exact activation command for your shell. It also refuses to run with an unsupported Python version and warns if you already activated another environment so you always know what is happening.
 
-| Platform | Command |
+| Scenario | Command |
 | --- | --- |
 | Windows (PowerShell) | `py setup_simulacra.py` |
 | Windows (Command Prompt) | `python setup_simulacra.py` |
 | macOS / Linux | `python3 setup_simulacra.py` |
+| Any platform, manage everything inside conda | `python setup_simulacra.py --use-conda` |
 
-The script accepts optional flags such as `--force-recreate` to rebuild the virtual environment, `--extras` to customise installed extras, and `--include-dev` to pull in linting/test tooling. Run `python setup_simulacra.py --help` for the complete list.
+Commonly used options:
+
+- `--force-recreate` – rebuild the environment from scratch (works for both venv and conda).
+- `--extras visualization analytics` – install only selected optional extras.
+- `--include-dev` – add linting, typing and documentation tooling.
+- `--conda-env simulacra --conda-python 3.11` – customise the conda environment name and Python version.
+
+Run `python setup_simulacra.py --help` for the complete list, including automation-friendly options.
 
 ### 3. Activate the virtual environment
 
@@ -60,6 +68,15 @@ If you cannot run the helper script, create a virtual environment manually and i
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # or the Windows equivalent above
+python -m pip install --upgrade pip
+python -m pip install -e .[desktop,visualization]
+```
+
+Prefer conda? Create an environment and install the package directly:
+
+```bash
+conda create --name simulacra python=3.10
+conda activate simulacra
 python -m pip install --upgrade pip
 python -m pip install -e .[desktop,visualization]
 ```

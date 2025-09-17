@@ -31,22 +31,42 @@ project folder.
 
 ## 3. Run the bootstrap helper
 
-Launch the cross-platform setup script. It creates a `.venv` directory and
-installs the default optional extras (`desktop` and `visualization`).
+Launch the cross-platform setup script. It creates a `.venv` directory by
+default, upgrades `pip`, installs the default optional extras (`desktop` and
+`visualization`), and prints clear activation instructions tailored to your
+shell. The helper refuses to proceed if it detects an unsupported Python
+version and warns if another environment is already active, so you always know
+what it is about to modify.
 
 | Platform | Command |
 | --- | --- |
 | Windows (PowerShell) | `py setup_simulacra.py` |
 | Windows (Command Prompt) | `python setup_simulacra.py` |
 | macOS / Linux | `python3 setup_simulacra.py` |
+| Any platform (manage everything inside conda) | `python setup_simulacra.py --use-conda` |
 
 Commonly used flags:
 
 - `--force-recreate`: delete and rebuild the virtual environment if it already exists.
 - `--extras visualization`: install only selected extras (space separated list).
 - `--include-dev`: add linting, testing and documentation tooling.
+- `--conda-env simulacra`: pick a custom environment name when using conda.
+- `--conda-python 3.11`: create the conda environment with a specific Python
+  version (defaults to 3.10).
 
 Run `python setup_simulacra.py --help` to see every option.
+
+> 🟦 **Prefer a conda workflow?**
+>
+> The helper automates conda just as well:
+>
+> ```bash
+> python setup_simulacra.py --use-conda --conda-env simulacra
+> ```
+>
+> This creates (or reuses) the named environment, ensures it runs Python 3.10+
+> and installs the requested extras. When the script finishes, activate it with
+> `conda activate simulacra` and you are ready to go.
 
 ## 4. Activate the virtual environment
 
@@ -88,6 +108,15 @@ If you prefer to manage the environment yourself:
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # or Windows equivalent
+python -m pip install --upgrade pip
+python -m pip install -e .[desktop,visualization]
+```
+
+For conda users:
+
+```bash
+conda create --name simulacra python=3.10
+conda activate simulacra
 python -m pip install --upgrade pip
 python -m pip install -e .[desktop,visualization]
 ```
