@@ -5,21 +5,13 @@ This script demonstrates the environmental cue system with various scenarios
 showing how spatial, temporal, and social cues affect agents based on their
 internal states and proximity to cue sources.
 """
-import sys
-import os
-from pathlib import Path
-
-# Add the project root to sys.path so we can import the ``src`` package
-project_root = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(project_root))
-
-from src.environment.cues import CueGenerator
-from src.utils.types import (
+from simulacra.environment.cues import CueGenerator
+from simulacra.utils.types import (
     CueType, PlotID, Coordinate, SimulationTime,
     PersonalityTraits, InternalState, AddictionState,
     SubstanceType, BehaviorType
 )
-from src.agents.agent import Agent
+from simulacra.agents.agent import Agent
 
 
 def demonstrate_distance_based_intensity():

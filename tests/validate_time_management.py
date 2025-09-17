@@ -1,14 +1,8 @@
 """
 Simple validation script for Phase 5.1 Time Management System
 """
-import sys
-import os
-
-# Add src to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-
-from simulation.time_manager import TimeManager, TimeEvent, ScheduledEvent, MonthlyStats
-from simulation import Simulation, SimulationConfig
+from simulacra.simulation.time_manager import TimeManager, TimeEvent, ScheduledEvent, MonthlyStats
+from simulacra.simulation import Simulation, SimulationConfig
 
 
 def test_time_manager_basic():

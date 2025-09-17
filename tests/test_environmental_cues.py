@@ -5,8 +5,8 @@ import pytest
 import math
 from unittest.mock import Mock, MagicMock
 
-from src.environment.cues import CueGenerator, CueSource
-from src.utils.types import (
+from simulacra.environment.cues import CueGenerator, CueSource
+from simulacra.utils.types import (
     CueType, PlotID, Coordinate, SimulationTime, 
     AlcoholCue, GamblingCue, FinancialStressCue,
     PersonalityTraits, InternalState, AddictionState,
@@ -49,7 +49,7 @@ class TestCueGenerator:
         
         # Intensity should decrease with distance
         for i in range(1, len(intensities)):
-            assert intensities[i] < intensities[i-1], f"Intensity should decrease with distance"
+            assert intensities[i] < intensities[i - 1], "Intensity should decrease with distance"
     
     def test_calculate_cue_intensity_beyond_radius(self):
         """Test that cue intensity is zero beyond max radius."""

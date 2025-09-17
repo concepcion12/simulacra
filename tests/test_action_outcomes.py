@@ -8,10 +8,10 @@ import pytest
 import numpy as np
 from typing import List
 
-from src.agents.agent import Agent
-from src.agents.decision_making import Action
-from src.agents.action_outcomes import ActionOutcomeGenerator, StateUpdater, OutcomeContext
-from src.utils.types import (
+from simulacra.agents.agent import Agent
+from simulacra.agents.decision_making import Action
+from simulacra.agents.action_outcomes import ActionOutcomeGenerator, StateUpdater, OutcomeContext
+from simulacra.utils.types import (
     ActionType,
     ActionOutcome,
     WorkOutcome,

@@ -1,12 +1,13 @@
 import unittest
-from src.simulation.simulation import Simulation, SimulationConfig
-from src.environment.city import City
-from src.environment.district import District
-from src.environment.plot import Plot
-from src.utils.types import PlotID, DistrictID, Coordinate, DistrictWealth
-from src.analytics.metrics import MetricsCollector
-from src.visualization.data_streamer import DataStreamer
-from src.visualization.visualization_server import VisualizationServer
+from simulacra.simulation.simulation import Simulation, SimulationConfig
+from simulacra.environment.city import City
+from simulacra.environment.district import District
+from simulacra.environment.plot import Plot
+from simulacra.utils.types import PlotID, DistrictID, Coordinate, DistrictWealth
+from simulacra.analytics.metrics import MetricsCollector
+from simulacra.visualization.data_streamer import DataStreamer
+from simulacra.visualization.visualization_server import VisualizationServer
+
 
 class TestSimulationControlAPI(unittest.TestCase):
     def setUp(self):
@@ -34,6 +35,7 @@ class TestSimulationControlAPI(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(self.simulation.is_running)
         self.assertEqual(resp.get_json()['status'], 'stopped')
+
 
 if __name__ == '__main__':
     unittest.main()
