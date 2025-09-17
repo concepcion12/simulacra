@@ -29,9 +29,10 @@ class SimulacraApp {
         this.setupNavigation();
         this.setupSocketHandlers();
         this.loadInitialData();
-        
+
         // Show home section by default
         this.showSection('home');
+        this.updateHomeMetrics();
     }
     
     setupNavigation() {
@@ -45,6 +46,13 @@ class SimulacraApp {
         });
         
         // Handle quick action buttons
+        const startSetupBtn = document.getElementById('startSetupBtn');
+        if (startSetupBtn) {
+            startSetupBtn.addEventListener('click', () => {
+                this.startNewSimulation();
+            });
+        }
+
         const newSimBtn = document.getElementById('newSimulationBtn');
         if (newSimBtn) {
             newSimBtn.addEventListener('click', () => {
@@ -63,6 +71,20 @@ class SimulacraApp {
         if (viewExamplesBtn) {
             viewExamplesBtn.addEventListener('click', () => {
                 this.showTemplateGallery();
+            });
+        }
+
+        const exploreTemplatesBtn = document.getElementById('exploreTemplatesBtn');
+        if (exploreTemplatesBtn) {
+            exploreTemplatesBtn.addEventListener('click', () => {
+                this.showTemplateGallery();
+            });
+        }
+
+        const refreshTemplatesBtn = document.getElementById('refreshTemplatesBtn');
+        if (refreshTemplatesBtn) {
+            refreshTemplatesBtn.addEventListener('click', () => {
+                this.refreshTemplateGallery();
             });
         }
         
@@ -138,12 +160,14 @@ class SimulacraApp {
             const projects = await this.apiCall('/api/projects');
             this.state.projects = projects;
             this.displayRecentProjects(projects);
-            
+            this.updateHomeMetrics();
+
             // Load template gallery
             const templates = await this.apiCall('/api/templates');
             this.state.templates = templates;
             this.displayTemplateGallery(templates);
-            
+            this.updateHomeMetrics();
+
         } catch (error) {
             console.error('Error loading initial data:', error);
             this.showNotification('Error loading application data', 'error');
@@ -262,69 +286,222 @@ class SimulacraApp {
     
     displayRecentProjects(projects) {
         const container = document.getElementById('recentProjects');
-        
+
+        if (!container) {
+            return;
+        }
+
         if (!projects || projects.length === 0) {
-            container.innerHTML = '<p class="text-muted">No recent projects</p>';
+            container.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-2x mb-3"></i>
+                    <p class="mb-0">No recent projects yet. Create a new simulation to see it here.</p>
+                </div>
+            `;
             return;
         }
-        
-        const projectsHtml = projects.slice(0, 5).map(project => `
-            <div class="project-item d-flex justify-content-between align-items-center" 
-                 onclick="app.loadProject('${project.id}')">
-                <div>
-                    <h6 class="mb-0">${project.name}</h6>
-                    <small class="text-muted">
-                        ${project.agents} agents, ${project.duration} months
-                        ${project.created_at ? '• ' + new Date(project.created_at).toLocaleDateString() : ''}
-                    </small>
-                </div>
-                <div>
-                    <span class="badge bg-secondary">${project.status}</span>
-                    <button class="btn btn-sm btn-outline-primary ms-2" 
-                            onclick="event.stopPropagation(); app.loadProject('${project.id}')">
-                        Load
-                    </button>
-                </div>
-            </div>
-        `).join('');
-        
-        container.innerHTML = projectsHtml;
-    }
-    
-    displayTemplateGallery(templates) {
-        const container = document.getElementById('templateGallery');
-        
-        if (!templates || templates.length === 0) {
-            container.innerHTML = '<div class="col-12"><p class="text-muted">No templates available</p></div>';
-            return;
-        }
-        
-        const templatesHtml = templates.map(template => `
-            <div class="col-md-3 mb-3">
-                <div class="card template-card" onclick="app.useTemplate('${template.id}')">
-                    <div class="card-body">
-                        <h6 class="card-title">${template.name}</h6>
-                        <p class="card-text small">${template.description}</p>
-                        <div class="d-flex justify-content-between align-items-end">
-                            <span class="badge bg-secondary">${template.category}</span>
-                            <button class="btn btn-sm btn-primary" 
-                                    onclick="event.stopPropagation(); app.useTemplate('${template.id}')">
-                                Use
-                            </button>
-                        </div>
-                        ${template.tags ? `
-                            <div class="mt-2">
-                                ${template.tags.map(tag => `<span class="badge bg-outline-secondary me-1">${tag}</span>`).join('')}
-                            </div>
-                        ` : ''}
+
+        const projectItems = projects.slice(0, 5).map(project => {
+            const projectId = project.id ?? '';
+            const name = project.name || project.configuration?.city_name || 'Untitled Project';
+            const agents = project.agents ?? project.total_agents;
+            const duration = project.duration ?? project.duration_months;
+            const createdAt = project.modified_at || project.updated_at || project.created_at;
+
+            const metaParts = [];
+            const agentsNumeric = agents !== undefined && agents !== null ? Number(agents) : null;
+            if (agentsNumeric !== null && !Number.isNaN(agentsNumeric)) {
+                metaParts.push(`${agentsNumeric.toLocaleString()} agents`);
+            } else if (typeof agents === 'string' && agents.trim()) {
+                metaParts.push(`${agents.trim()} agents`);
+            }
+
+            const durationNumeric = duration !== undefined && duration !== null ? Number(duration) : null;
+            if (durationNumeric !== null && !Number.isNaN(durationNumeric)) {
+                metaParts.push(`${durationNumeric} months`);
+            } else if (typeof duration === 'string' && duration.trim()) {
+                metaParts.push(`${duration.trim()} months`);
+            }
+            if (createdAt) {
+                const date = new Date(createdAt);
+                if (!Number.isNaN(date.getTime())) {
+                    metaParts.push(date.toLocaleDateString());
+                }
+            }
+
+            const status = project.status || 'Draft';
+
+            return `
+                <div class="list-group-item project-item" data-project-id="${projectId}">
+                    <div>
+                        <h6 class="mb-1">${name}</h6>
+                        <div class="project-meta">${metaParts.join(' • ') || 'Awaiting configuration'}</div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge badge-outline">${status}</span>
+                        <button type="button" class="btn btn-sm btn-outline-light project-load-btn" data-project-id="${projectId}">
+                            Load
+                        </button>
                     </div>
                 </div>
-            </div>
-        `).join('');
-        
-        container.innerHTML = templatesHtml;
+            `;
+        }).join('');
+
+        container.innerHTML = `<div class="list-group list-group-flush project-list">${projectItems}</div>`;
+
+        container.querySelectorAll('.project-item').forEach(item => {
+            item.addEventListener('click', (event) => {
+                if (!(event.target instanceof HTMLElement)) {
+                    return;
+                }
+
+                if (event.target.closest('.project-load-btn')) {
+                    return;
+                }
+
+                const projectId = item.getAttribute('data-project-id');
+                if (projectId) {
+                    this.loadProject(projectId);
+                }
+            });
+        });
+
+        container.querySelectorAll('.project-load-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const projectId = button.getAttribute('data-project-id');
+                if (projectId) {
+                    this.loadProject(projectId);
+                }
+            });
+        });
     }
-    
+
+    displayTemplateGallery(templates) {
+        const container = document.getElementById('templateGallery');
+
+        if (!container) {
+            return;
+        }
+
+        if (!templates || templates.length === 0) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-layer-group fa-2x mb-3"></i>
+                        <p class="mb-0">No templates available yet. Save a configuration to reuse it later.</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        const templatesHtml = templates.map(template => {
+            const tags = Array.isArray(template.tags)
+                ? template.tags.map(tag => `<span class="badge badge-outline">${tag}</span>`).join(' ')
+                : '';
+
+            return `
+                <div class="col-sm-6 col-xl-3 d-flex">
+                    <div class="card template-card flex-grow-1" data-template-id="${template.id}">
+                        <div class="card-body">
+                            <h6 class="card-title">${template.name}</h6>
+                            <p class="card-text small text-muted">${template.description || 'No description provided.'}</p>
+                            <div class="d-flex justify-content-between align-items-end gap-2 mt-auto">
+                                <span class="badge badge-outline">${template.category || 'General'}</span>
+                                <button type="button" class="btn btn-sm btn-primary use-template-btn" data-template-id="${template.id}">
+                                    Use
+                                </button>
+                            </div>
+                            ${tags ? `<div class="mt-2 d-flex flex-wrap gap-2">${tags}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = templatesHtml;
+
+        container.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const templateId = card.getAttribute('data-template-id');
+                if (templateId) {
+                    this.useTemplate(templateId);
+                }
+            });
+        });
+
+        container.querySelectorAll('.use-template-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const templateId = button.getAttribute('data-template-id');
+                if (templateId) {
+                    this.useTemplate(templateId);
+                }
+            });
+        });
+    }
+
+    async refreshTemplateGallery() {
+        try {
+            this.showLoading(true);
+            const templates = await this.apiCall('/api/templates');
+            this.state.templates = templates;
+            this.displayTemplateGallery(templates);
+            this.updateHomeMetrics();
+            this.showNotification('Template library updated', 'success');
+        } catch (error) {
+            console.error('Error refreshing templates:', error);
+            this.showNotification('Unable to refresh templates', 'error');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    updateHomeMetrics() {
+        const projectCountEl = document.getElementById('metricProjects');
+        if (projectCountEl) {
+            const projectCount = Array.isArray(this.state.projects) ? this.state.projects.length : 0;
+            projectCountEl.textContent = projectCount.toLocaleString();
+        }
+
+        const templateCountEl = document.getElementById('metricTemplates');
+        if (templateCountEl) {
+            const templateCount = Array.isArray(this.state.templates) ? this.state.templates.length : 0;
+            templateCountEl.textContent = templateCount.toLocaleString();
+        }
+
+        const lastUpdatedEl = document.getElementById('metricLastUpdated');
+        if (lastUpdatedEl) {
+            let latestDate = null;
+
+            if (Array.isArray(this.state.projects)) {
+                for (const project of this.state.projects) {
+                    const timestamp = project.modified_at || project.updated_at || project.created_at;
+                    if (!timestamp) {
+                        continue;
+                    }
+
+                    const date = new Date(timestamp);
+                    if (Number.isNaN(date.getTime())) {
+                        continue;
+                    }
+
+                    if (!latestDate || date > latestDate) {
+                        latestDate = date;
+                    }
+                }
+            }
+
+            lastUpdatedEl.textContent = latestDate ? latestDate.toLocaleDateString() : 'Awaiting first save';
+        }
+
+        const statusEl = document.getElementById('metricStatus');
+        if (statusEl) {
+            statusEl.textContent = this.socket && this.socket.connected ? 'Live Connection' : 'Offline Mode';
+        }
+    }
+
     async useTemplate(templateId) {
         try {
             this.showLoading(true);
@@ -488,8 +665,10 @@ class SimulacraApp {
                 statusElement.innerHTML = '<i class="fas fa-wifi"></i> Disconnected';
             }
         }
+
+        this.updateHomeMetrics();
     }
-    
+
     showLoading(show) {
         const overlay = document.getElementById('loadingOverlay');
         if (overlay) {
@@ -500,9 +679,16 @@ class SimulacraApp {
     showNotification(message, type = 'info') {
         // Create notification element
         const notification = document.createElement('div');
-        notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        const typeMap = {
+            success: 'success',
+            info: 'info',
+            warning: 'warning',
+            error: 'danger'
+        };
+        const alertType = typeMap[type] ?? 'info';
+        notification.className = `alert alert-${alertType} alert-dismissible fade show position-fixed`;
         notification.style.cssText = 'top: 90px; right: 20px; z-index: 9999; min-width: 300px;';
-        
+
         notification.innerHTML = `
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
