@@ -201,6 +201,7 @@ class ActionBudget:
     """Monthly action budget management."""
     total_hours: float = 280.0
     spent_hours: float = 0.0
+    actions_taken: int = 0
 
     def can_afford(self, hours: float) -> bool:
         """Check if agent can afford to spend hours on action."""
@@ -209,15 +210,22 @@ class ActionBudget:
     def spend(self, hours: float) -> None:
         """Spend hours from budget."""
         self.spent_hours += hours
+        self.actions_taken += 1
 
     def reset(self) -> None:
         """Reset budget for new month."""
         self.spent_hours = 0.0
+        self.actions_taken = 0
 
     @property
     def remaining_hours(self) -> float:
         """Get remaining hours in budget."""
         return self.total_hours - self.spent_hours
+
+    @property
+    def hours_remaining(self) -> float:
+        """Backward-compatible alias for remaining hours."""
+        return self.remaining_hours
 
 
 @dataclass
