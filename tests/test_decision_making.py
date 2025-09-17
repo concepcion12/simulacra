@@ -1,309 +1,139 @@
-"""
-Test script to verify the decision-making system functionality.
-"""
-import sys
-sys.path.append('.')
+"""Unit tests for the behavioral decision-making system."""
+from __future__ import annotations
+
+from typing import Dict
 
 import numpy as np
-from src.agents import Agent, Action, ActionContext, generate_available_actions
-from src.utils.types import (
-    ActionType, BehaviorType, SubstanceType, ActionCost,
-    AlcoholCue, GamblingCue, FinancialStressCue
+import pytest
+
+from simulacra.agents import Agent, Action, ActionContext, generate_available_actions
+from simulacra.utils.types import (
+    ActionType,
+    BehaviorType,
+    SubstanceType,
+    EmploymentInfo,
 )
 
 
-def test_action_generation():
-    """Test generating available actions based on agent state."""
-    print("Testing action generation...")
-    
-    # Create agents in different states
-    agents = {
-        'employed': Agent.create_with_profile('balanced', initial_wealth=1500),
-        'unemployed': Agent.create_with_profile('vulnerable', initial_wealth=300),
-        'poor': Agent.create_with_profile('impulsive', initial_wealth=50),
-        'wealthy': Agent.create_with_profile('cautious', initial_wealth=5000)
-    }
-    
-    # Give the employed agent a job (mock employment)
-    class MockJob:
-        monthly_salary = 2000
-        stress_level = 0.5
-    
-    class MockEmployment:
-        job = MockJob()
-    
-    agents['employed'].employment = MockEmployment()
-    
-    # Generate actions for each agent
-    for name, agent in agents.items():
-        context = ActionContext(agent=agent)
-        actions = generate_available_actions(agent, context)
-        
-        print(f"\n{name.capitalize()} agent (wealth=${agent.internal_state.wealth}):")
-        print(f"  Available actions: {[a.action_type.name for a in actions]}")
-        print(f"  Total time cost: {sum(a.time_cost for a in actions)} hours")
-
-
-def test_utility_calculation():
-    """Test utility calculation for different actions."""
-    print("\n\nTesting utility calculation...")
-    
-    # Create agent with specific state
-    agent = Agent.create_with_profile('vulnerable', initial_wealth=500)
-    agent.internal_state.stress = 0.7
-    agent.internal_state.mood = -0.3
-    
-    # Give agent some addiction/habit history
-    agent.addiction_states[SubstanceType.ALCOHOL].stock = 0.4
-    agent.addiction_states[SubstanceType.ALCOHOL].withdrawal_severity = 0.3
-    agent.habit_stocks[BehaviorType.GAMBLING] = 0.5
-    agent.update_internal_states()
-    
-    # Create context
-    context = ActionContext(agent=agent)
-    # Test different actions
-    test_actions = [
-        Action(ActionType.WORK, 160),
-        Action(ActionType.DRINK, 2, parameters={'units': 2}),
-        Action(ActionType.GAMBLE, 4),
-        Action(ActionType.REST, 4),
-        Action(ActionType.BEG, 8)
-    ]
-
-    print(
-        f"\nAgent state: stress={agent.internal_state.stress:.2f}, "
-        f"mood={agent.internal_state.mood:.2f}, "
-        f"alcohol_craving={agent.craving_intensities[SubstanceType.ALCOHOL]:.2f}"
-    )
-    
-    # Calculate utilities
-    utility_calc = agent.decision_maker.utility_calculator
-    
-    for action in test_actions:
-        total_utility, components = utility_calc.calculate_total_utility(
-            action, agent, context
-        )
-        
-        print(f"\n{action.action_type.name}:")
-        print(f"  Total utility: {total_utility:.3f}")
-        print("  Components:")
-        for comp, value in components.items():
-            print(f"    {comp}: {value:.3f}")
-
-
-def test_dual_process_decision():
-    """Test dual-process decision making."""
-    print("\n\nTesting dual-process decision making...")
-    
-    # Create agents with different cognitive types
-    agents = {
-        'intuitive': Agent.create_with_profile('impulsive'),
-        'deliberative': Agent.create_with_profile('cautious'),
-        'stressed': Agent.create_with_profile('balanced')
-    }
-    
-    # Put the stressed agent under pressure
-    agents['stressed'].internal_state.stress = 0.9
-    agents['stressed'].internal_state.self_control_resource = 0.3
-    agents['stressed'].craving_intensities[SubstanceType.ALCOHOL] = 0.8
-    
-    # Test decision making for each
-    for name, agent in agents.items():
-        print(f"\n{name.capitalize()} agent (θ_base={agent.personality.cognitive_type:.2f}):")
-        
-        # Calculate effective theta
-        theta_eff = agent.decision_maker._calculate_effective_theta(agent)
-        print(f"  Effective θ: {theta_eff:.3f}")
-        
-        # Generate actions
-        context = ActionContext(agent=agent)
-        actions = generate_available_actions(agent, context)
-        
-        # Evaluate each action
-        evaluations = []
-        for action in actions[:5]:  # Limit to first 5 for brevity
-            eval_result = agent.decision_maker._evaluate_action(
-                action, agent, context, theta_eff
-            )
-            evaluations.append(eval_result)
-            
-            print(f"  {action.action_type.name}:")
-            print(f"    System 1: {eval_result.system1_utility:.3f}")
-            print(f"    System 2: {eval_result.system2_utility:.3f}")
-            print(f"    Combined: {eval_result.combined_utility:.3f}")
-
-
-def test_action_selection():
-    """Test probabilistic action selection."""
-    print("\n\nTesting action selection...")
-    
-    # Create agent with cravings
-    agent = Agent.create_with_profile('vulnerable', initial_wealth=200)
-    agent.internal_state.stress = 0.6
-    agent.addiction_states[SubstanceType.ALCOHOL].stock = 0.5
-    agent.addiction_states[SubstanceType.ALCOHOL].withdrawal_severity = 0.4
-    agent.habit_stocks[BehaviorType.GAMBLING] = 0.3
-    agent.update_internal_states()
-    
-    # Generate available actions
-    context = ActionContext(agent=agent)
-    actions = generate_available_actions(agent, context)
-    
-    print(f"Agent state: stress={agent.internal_state.stress:.2f}, "
-          f"alcohol_craving={agent.craving_intensities[SubstanceType.ALCOHOL]:.2f}, "
-          f"gambling_craving={agent.craving_intensities[BehaviorType.GAMBLING]:.2f}")
-    
-    # Get action probabilities
-    action_probs = agent.decision_maker.get_action_probabilities(
-        agent, actions, context
-    )
-    
-    print("\nAction probabilities:")
-    for action, prob in sorted(action_probs, key=lambda x: x[1], reverse=True):
-        print(f"  {action.action_type.name}: {prob:.3f}")
-    
-    # Simulate multiple decisions
-    print("\nSimulating 100 decisions:")
-    decision_counts = {}
-    
-    for _ in range(100):
-        chosen_action = agent.make_decision(actions, context)
-        action_name = chosen_action.action_type.name
-        decision_counts[action_name] = decision_counts.get(action_name, 0) + 1
-    
-    print("Decision frequencies:")
-    for action_name, count in sorted(decision_counts.items(), 
-                                   key=lambda x: x[1], reverse=True):
-        print(f"  {action_name}: {count}%")
-
-
-def test_state_dependent_weights():
-    """Test how utility weights change with agent state."""
-    print("\n\nTesting state-dependent utility weights...")
-    
-    agent = Agent.create_with_profile('balanced')
-    utility_calc = agent.decision_maker.utility_calculator
-    
-    # Test different states
-    states = [
-        ("Normal", {}),
-        ("High craving", {
-            'craving': {SubstanceType.ALCOHOL: 0.8}
-        }),
-        ("Financial pressure", {
-            'wealth': 200,
-            'expenses': 800
-        }),
-        ("High stress", {
-            'stress': 0.8
-        }),
-        ("Combined pressure", {
-            'stress': 0.8,
-            'craving': {SubstanceType.ALCOHOL: 0.7},
-            'wealth': 100
-        })
-    ]
-    
-    for state_name, modifications in states:
-        # Reset agent
-        agent.internal_state.stress = 0.3
-        agent.internal_state.wealth = 1000
-        agent.internal_state.monthly_expenses = 800
-        agent.craving_intensities[SubstanceType.ALCOHOL] = 0.0
-        
-        # Apply modifications
-        if 'stress' in modifications:
-            agent.internal_state.stress = modifications['stress']
-        if 'wealth' in modifications:
-            agent.internal_state.wealth = modifications['wealth']
-        if 'expenses' in modifications:
-            agent.internal_state.monthly_expenses = modifications['expenses']
-        if 'craving' in modifications:
-            for substance, level in modifications['craving'].items():
-                agent.craving_intensities[substance] = level
-        
-        # Calculate weights
-        weights = utility_calc._calculate_state_dependent_weights(agent)
-        
-        print(f"\n{state_name}:")
-        print(f"  Financial: {weights.financial:.3f}")
-        print(f"  Habit: {weights.habit:.3f}")
-        print(f"  Addiction: {weights.addiction:.3f}")
-        print(f"  Psychological: {weights.psychological:.3f}")
-        print(f"  Social: {weights.social:.3f}")
-
-
-def test_environmental_influence():
-    """Test how environmental cues affect decision making."""
-    print("\n\nTesting environmental influence on decisions...")
-    
-    agent = Agent.create_with_profile('vulnerable', initial_wealth=500)
-    
-    # Give agent some susceptibility
-    agent.addiction_states[SubstanceType.ALCOHOL].stock = 0.3
-    agent.habit_stocks[BehaviorType.GAMBLING] = 0.4
-    agent.update_internal_states()
-    
-    # Before cues
-    context = ActionContext(agent=agent)
-    actions = generate_available_actions(agent, context)
-    
-    print("Before environmental cues:")
-    probs_before = agent.decision_maker.get_action_probabilities(
-        agent, actions, context
-    )
-    for action, prob in sorted(probs_before, key=lambda x: x[1], reverse=True)[:5]:
-        print(f"  {action.action_type.name}: {prob:.3f}")
-    
-    # Process environmental cues
-    cues = [
-        AlcoholCue(intensity=0.8),
-        GamblingCue(intensity=0.6),
-        FinancialStressCue(intensity=0.5)
-    ]
-    agent.process_environmental_cues(cues)
-    
-    print(f"\nAfter cues: alcohol_craving={agent.craving_intensities[SubstanceType.ALCOHOL]:.2f}, "
-          f"gambling_craving={agent.craving_intensities[BehaviorType.GAMBLING]:.2f}, "
-          f"stress={agent.internal_state.stress:.2f}")
-    
-    # After cues
-    print("\nAfter environmental cues:")
-    probs_after = agent.decision_maker.get_action_probabilities(
-        agent, actions, context
-    )
-    for action, prob in sorted(probs_after, key=lambda x: x[1], reverse=True)[:5]:
-        print(f"  {action.action_type.name}: {prob:.3f}")
-    
-    # Show changes
-    print("\nProbability changes:")
-    prob_dict_before = {a.action_type.name: p for a, p in probs_before}
-    prob_dict_after = {a.action_type.name: p for a, p in probs_after}
-    
-    for action_name in prob_dict_after:
-        change = prob_dict_after[action_name] - prob_dict_before.get(action_name, 0)
-        if abs(change) > 0.01:
-            print(f"  {action_name}: {change:+.3f}")
-
-
-if __name__ == "__main__":
-    print("=== Decision-Making System Test ===\n")
-    
-    # Set random seed for reproducibility
+@pytest.fixture(autouse=True)
+def _seed_random() -> None:
+    """Seed numpy's RNG for deterministic probabilistic choices."""
     np.random.seed(42)
-    
-    test_action_generation()
-    test_utility_calculation()
-    test_dual_process_decision()
-    test_action_selection()
-    test_state_dependent_weights()
-    test_environmental_influence()
-    
-    print("\n=== All decision-making tests completed! ===")
-    print("\nThe decision-making system is working correctly with:")
-    print("✓ Multi-component utility calculation")
-    print("✓ State-dependent utility weights")
-    print("✓ Dual-process (System 1/2) evaluation")
-    print("✓ Probabilistic action selection")
-    print("✓ Environmental cue influence")
-    print("✓ Behavioral economics integration") 
+
+
+@pytest.fixture
+def baseline_agent() -> Agent:
+    """Return a balanced agent with a replenished action budget."""
+    agent = Agent.create_with_profile("balanced", initial_wealth=1200.0)
+    agent.action_budget.reset()
+    return agent
+
+
+def _action_probabilities(agent: Agent, actions: list[Action]) -> Dict[ActionType, float]:
+    """Helper to compute a mapping of action type to probability."""
+    context = ActionContext(agent=agent)
+    probability_pairs = agent.decision_maker.get_action_probabilities(agent, actions, context)
+    return {action.action_type: prob for action, prob in probability_pairs}
+
+
+def test_generate_available_actions_always_offers_rest(baseline_agent: Agent) -> None:
+    """Agents with remaining budget should always be able to rest."""
+    context = ActionContext(agent=baseline_agent)
+    actions = generate_available_actions(baseline_agent, context)
+    action_types = {action.action_type for action in actions}
+
+    assert ActionType.REST in action_types
+
+
+def test_generate_available_actions_respects_budget(baseline_agent: Agent) -> None:
+    """Spending the entire budget removes time-intensive options such as rest."""
+    baseline_agent.action_budget.spend(baseline_agent.action_budget.total_hours)
+    context = ActionContext(agent=baseline_agent)
+    actions = generate_available_actions(baseline_agent, context)
+
+    assert all(action.action_type != ActionType.REST for action in actions)
+
+
+def test_addiction_component_rewards_relief() -> None:
+    """Addiction relief should increase the utility of alcohol consumption."""
+    agent = Agent.create_with_profile("vulnerable", initial_wealth=500.0)
+    alcohol_state = agent.addiction_states[SubstanceType.ALCOHOL]
+    alcohol_state.stock = 0.7
+    alcohol_state.withdrawal_severity = 0.6
+    agent.craving_intensities[SubstanceType.ALCOHOL] = 0.8
+
+    action = Action(ActionType.DRINK, time_cost=2.0, parameters={"units": 2})
+    total, components = agent.decision_maker.utility_calculator.calculate_total_utility(
+        action,
+        agent,
+        ActionContext(agent=agent),
+    )
+
+    assert components["addiction"] > 0
+    assert components["financial"] < 0
+    assert total > 0  # Relief outweighs the financial penalty under heavy craving
+
+
+def test_work_financial_utility_exceeds_begging() -> None:
+    """Working with a stable job should provide more utility than begging."""
+    agent = Agent.create_with_profile("balanced", initial_wealth=800.0)
+    employment = EmploymentInfo(job_quality=0.7, base_salary=2500.0)
+    employment.job = type("MockJob", (), {"monthly_salary": 2200.0, "stress_level": 0.2})()
+    agent.employment = employment
+
+    work = Action(ActionType.WORK, time_cost=160.0)
+    beg = Action(ActionType.BEG, time_cost=8.0)
+    context = ActionContext(agent=agent)
+
+    work_total, _ = agent.decision_maker.utility_calculator.calculate_total_utility(
+        work,
+        agent,
+        context,
+    )
+    beg_total, _ = agent.decision_maker.utility_calculator.calculate_total_utility(
+        beg,
+        agent,
+        context,
+    )
+
+    assert work_total > beg_total
+
+
+def test_dual_process_theta_reacts_to_stress(baseline_agent: Agent) -> None:
+    """High stress and craving should reduce System 2 influence."""
+    decision_maker = baseline_agent.decision_maker
+    theta_base = decision_maker._calculate_effective_theta(baseline_agent)
+
+    baseline_agent.internal_state.self_control_resource = 0.3
+    baseline_agent.internal_state.cognitive_load = 0.4
+    baseline_agent.internal_state.stress = 0.9
+    baseline_agent.craving_intensities[SubstanceType.ALCOHOL] = 0.85
+
+    theta_stressed = decision_maker._calculate_effective_theta(baseline_agent)
+
+    assert theta_stressed < theta_base
+    assert theta_stressed >= 0.1  # Guardrail from implementation
+
+
+def test_craving_shifts_action_preferences() -> None:
+    """Increasing craving raises the probability of drinking over resting."""
+    agent = Agent.create_with_profile("vulnerable", initial_wealth=400.0)
+    rest_action = Action(ActionType.REST, time_cost=4.0)
+    drink_action = Action(ActionType.DRINK, time_cost=2.0, parameters={"units": 2})
+
+    low_craving_probs = _action_probabilities(agent, [rest_action, drink_action])
+    low_rest = low_craving_probs[ActionType.REST]
+    low_drink = low_craving_probs[ActionType.DRINK]
+
+    agent.craving_intensities[SubstanceType.ALCOHOL] = 0.9
+    agent.addiction_states[SubstanceType.ALCOHOL].withdrawal_severity = 0.5
+    agent.habit_stocks[BehaviorType.DRINKING] = 0.6
+
+    high_craving_probs = _action_probabilities(agent, [rest_action, drink_action])
+    high_rest = high_craving_probs[ActionType.REST]
+    high_drink = high_craving_probs[ActionType.DRINK]
+
+    assert pytest.approx(low_rest + low_drink, rel=1e-6) == 1.0
+    assert pytest.approx(high_rest + high_drink, rel=1e-6) == 1.0
+    assert high_drink > low_drink
+    assert high_rest < low_rest

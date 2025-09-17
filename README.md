@@ -58,8 +58,8 @@ simulacra-desktop
 
 ### Running the Example Scripts
 
-Demo scripts are located in the `examples/` directory. Run them from the project
-root so the `src` package can be discovered:
+Demo scripts are located in the `examples/` directory. Install the project in
+editable mode so the `simulacra` package is importable, then run for example:
 
 ```bash
 python examples/cue_system_demo.py

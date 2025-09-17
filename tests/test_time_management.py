@@ -13,13 +13,13 @@ import unittest
 from unittest.mock import Mock, MagicMock
 from typing import List
 
-from src.simulation.time_manager import TimeManager, TimeEvent, ScheduledEvent, MonthlyStats
-from src.simulation import Simulation, SimulationConfig
-from src.agents.agent import Agent
-from src.environment.city import City
-from src.environment.district import District
-from src.environment.plot import Plot
-from src.utils.types import (
+from simulacra.simulation.time_manager import TimeManager, TimeEvent, ScheduledEvent, MonthlyStats
+from simulacra.simulation import Simulation, SimulationConfig
+from simulacra.agents.agent import Agent
+from simulacra.environment.city import City
+from simulacra.environment.district import District
+from simulacra.environment.plot import Plot
+from simulacra.utils.types import (
     PlotID, DistrictID, DistrictWealth, Coordinate, EmploymentInfo, 
     HousingInfo, EmployerID, JobID, UnitID, AgentID
 )

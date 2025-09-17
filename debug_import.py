@@ -7,7 +7,7 @@ def test_imports():
     print("Testing individual imports...")
     
     try:
-        from src.agents.behavioral_economics import (
+        from simulacra.agents.behavioral_economics import (
             ProspectTheoryModule, TemporalDiscountingModule, DualProcessModule,
             GamblingBiasModule, HabitFormationModule, AddictionModule
         )
@@ -23,14 +23,14 @@ def test_imports():
         
         for mod_name in modules:
             try:
-                exec(f"from src.agents.behavioral_economics import {mod_name}")
+                exec(f"from simulacra.agents.behavioral_economics import {mod_name}")
                 print(f"✅ {mod_name} import successful")
             except Exception as e:
                 print(f"❌ {mod_name} import failed: {e}")
         return
     
     try:
-        from src.agents.agent import Agent
+        from simulacra.agents.agent import Agent
         print("✅ Agent import successful")
     except Exception as e:
         print(f"❌ Agent import failed: {e}")

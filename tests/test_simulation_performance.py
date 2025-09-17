@@ -1,10 +1,11 @@
 import unittest
-from src.simulation.simulation import Simulation, SimulationConfig
-from src.agents.agent import Agent
-from src.environment.city import City
-from src.environment.district import District
-from src.environment.plot import Plot
-from src.utils.types import PlotID, DistrictID, Coordinate, DistrictWealth
+from simulacra.simulation.simulation import Simulation, SimulationConfig
+from simulacra.agents.agent import Agent
+from simulacra.environment.city import City
+from simulacra.environment.district import District
+from simulacra.environment.plot import Plot
+from simulacra.utils.types import PlotID, DistrictID, Coordinate, DistrictWealth
+
 
 class TestSimulationControl(unittest.TestCase):
     def setUp(self):
@@ -28,6 +29,6 @@ class TestSimulationControl(unittest.TestCase):
         stats = sim.run_single_month()
         self.assertEqual(stats.month, 2)
 
+
 if __name__ == '__main__':
     unittest.main()
-

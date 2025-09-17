@@ -13,19 +13,12 @@ with project management and template gallery functionality.
 """
 
 import sys
-import os
-from pathlib import Path
-
-# Add the project root to the path so we can import Simulacra modules
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
 
 try:
-    from src.visualization.unified_app import UnifiedSimulacraApp
-except ImportError as e:
-    print(f"Error importing Simulacra modules: {e}")
-    print("Make sure you're running this from the project root directory")
-    print("and that all dependencies are installed.")
+    from simulacra.visualization.unified_app import UnifiedSimulacraApp
+except ImportError as exc:
+    print(f"Error importing Simulacra modules: {exc}")
+    print("Install the project in editable mode: pip install -e .[visualization]")
     sys.exit(1)
 
 

@@ -47,9 +47,9 @@ cd Simulacra
 ### Basic Usage
 
 ```python
-from src.simulation.simulation import Simulation, SimulationConfig
-from src.environment.city import City
-from src.population.population_generator import QuickPopulationFactory
+from simulacra.simulation.simulation import Simulation, SimulationConfig
+from simulacra.environment.city import City
+from simulacra.population.population_generator import QuickPopulationFactory
 
 # Create a simulation
 config = SimulationConfig(max_months=12, max_agents=100)
@@ -64,13 +64,13 @@ simulation.run()
 ### 1. Environment Setup
 
 ```python
-from src.environment.city import City
-from src.environment.district import District
-from src.environment.plot import Plot
-from src.environment.buildings.residential import ResidentialBuilding, HousingUnit
-from src.environment.buildings.employer import Employer, JobOpening
-from src.environment.buildings.liquor_store import LiquorStore
-from src.environment.buildings.casino import Casino, GamblingGame
+from simulacra.environment.city import City
+from simulacra.environment.district import District
+from simulacra.environment.plot import Plot
+from simulacra.environment.buildings.residential import ResidentialBuilding, HousingUnit
+from simulacra.environment.buildings.employer import Employer, JobOpening
+from simulacra.environment.buildings.liquor_store import LiquorStore
+from simulacra.environment.buildings.casino import Casino, GamblingGame
 
 # Create districts
 poor_district = District("poor", "Downtown", wealth_level=1, plots=[])
@@ -89,7 +89,7 @@ city = City("Demo City", [poor_district, middle_district, rich_district])
 ### 2. Population Generation
 
 ```python
-from src.population.population_generator import QuickPopulationFactory
+from simulacra.population.population_generator import QuickPopulationFactory
 
 # Quick generation methods
 agents = QuickPopulationFactory.create_balanced_population(50)  # Realistic population
@@ -98,8 +98,8 @@ agents = QuickPopulationFactory.create_vulnerable_population(50) # Higher addict
 agents = QuickPopulationFactory.create_mixed_population(50, vulnerable_proportion=0.3)
 
 # Custom generation with specific distributions
-from src.population.distribution_config import DistributionConfig
-from src.population.population_generator import PopulationGenerator
+from simulacra.population.distribution_config import DistributionConfig
+from simulacra.population.population_generator import PopulationGenerator
 
 config = DistributionConfig.create_realistic_default()
 generator = PopulationGenerator(config, seed=42)
@@ -109,7 +109,7 @@ agents = generator.generate_population(50)
 ### 3. Simulation Configuration
 
 ```python
-from src.simulation.simulation import Simulation, SimulationConfig
+from simulacra.simulation.simulation import Simulation, SimulationConfig
 
 config = SimulationConfig(
     max_months=24,          # Run for 2 years
@@ -165,8 +165,8 @@ simulation.add_agents(agents)
 results = simulation.run()
 
 # With analytics
-from src.analytics.metrics import MetricsCollector
-from src.analytics.history import HistoryTracker
+from simulacra.analytics.metrics import MetricsCollector
+from simulacra.analytics.history import HistoryTracker
 
 metrics_collector = MetricsCollector()
 history_tracker = HistoryTracker()
@@ -189,7 +189,7 @@ for month in range(12):
 ### Starting the Dashboard
 
 ```python
-from src.visualization.real_time_dashboard import RealtimeDashboard
+from simulacra.visualization.real_time_dashboard import RealtimeDashboard
 
 # Create and start dashboard
 dashboard = RealtimeDashboard(
@@ -231,7 +231,7 @@ Access the dashboard at: `http://localhost:5000`
 ### Metrics Collection
 
 ```python
-from src.analytics.metrics import MetricsCollector
+from simulacra.analytics.metrics import MetricsCollector
 
 collector = MetricsCollector(poverty_line=800.0)
 
@@ -248,7 +248,7 @@ print(f"Population: {pop_metrics.employment_rate:.1%} employed, {pop_metrics.add
 ### Historical Tracking
 
 ```python
-from src.analytics.history import HistoryTracker
+from simulacra.analytics.history import HistoryTracker
 
 tracker = HistoryTracker()
 
@@ -267,7 +267,7 @@ action_sequence = history.get_action_sequence()
 
 ```python
 # Export analytics data
-from src.analytics.data_exporter import DataExporter
+from simulacra.analytics.data_exporter import DataExporter
 
 exporter = DataExporter("simulation_output")
 
@@ -285,8 +285,8 @@ exporter.export_life_events(tracker.get_all_histories())
 ### Custom Agent Behaviors
 
 ```python
-from src.agents.agent import Agent
-from src.utils.types import PersonalityTraits
+from simulacra.agents.agent import Agent
+from simulacra.utils.types import PersonalityTraits
 
 # Create agent with specific personality
 personality = PersonalityTraits(
